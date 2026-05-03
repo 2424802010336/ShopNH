@@ -1,0 +1,15 @@
+﻿@{ ViewBag.Title = "Xác nhận Email"; }
+
+<div class="container mt-5 text-center">
+    <div class="card shadow border-0 mx-auto py-5" style="max-width: 500px; border-radius: 25px;">
+        <div class="card-body">
+            <i class="fa-solid fa-circle-check fa-5x text-success mb-4"></i>
+            <h2 class="fw-bold">XÁC NHẬN THÀNH CÔNG!</h2>
+            <p class="text-muted lead">Cảm ơn bạn đã xác nhận địa chỉ Email của mình.</p>
+            <div class="mt-4">
+                <a href="@Url.Action("Login", "Account")" class="btn btn-lg text-white px-5"
+                   style="background-color: #ff8c00; border-radius: 15px; font-weight: bold;">ĐĂNG NHẬP NGAY</a>
+            </div>
+        </div>
+    </div>
+</div>

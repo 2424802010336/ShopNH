@@ -1,0 +1,34 @@
+﻿@model WebApplication2.Models.VerifyCodeViewModel
+@{ ViewBag.Title = "Xác minh"; }
+
+<div class="container mt-5">
+    <div class="card shadow border-0 mx-auto" style="max-width: 450px; border-radius: 20px;">
+        <div class="card-body p-5 text-center">
+            <i class="fa-solid fa-shield-halved fa-4x mb-4" style="color: #ff8c00;"></i>
+            <h3 class="fw-bold mb-3">NHẬP MÃ CODE</h3>
+            <hr />
+
+            @using (Html.BeginForm("VerifyCode", "Account", new { ReturnUrl = Model.ReturnUrl }, FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                @Html.Hidden("provider", @Model.Provider)
+                @Html.Hidden("rememberMe", @Model.RememberMe)
+                @Html.ValidationSummary("", new { @class = "text-danger small mb-3" })
+
+                <div class="mb-4 text-start">
+                    <label class="fw-bold small text-muted mb-2">MÃ XÁC MINH</label>
+                    @Html.TextBoxFor(m => m.Code, new { @class = "form-control text-center fs-4", placeholder = "******", style = "border-radius: 10px; border: 2px solid #ff8c00;" })
+                </div>
+
+                <div class="form-check mb-4 text-start">
+                    @Html.CheckBoxFor(m => m.RememberBrowser, new { @class = "form-check-input" })
+                    <label class="form-check-label small">Ghi nhớ trình duyệt này</label>
+                </div>
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-lg text-white" style="background-color: #ff8c00; border-radius: 12px; font-weight: bold;">XÁC THỰC</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>

@@ -1,0 +1,13 @@
+﻿@{ ViewBag.Title = "Lỗi đăng nhập"; }
+
+<div class="container mt-5 text-center">
+    <div class="card border-0 shadow-sm mx-auto" style="max-width: 450px; border-radius: 20px;">
+        <div class="card-body p-5">
+            <i class="fa-solid fa-circle-xmark fa-5x text-danger mb-4"></i>
+            <h2 class="fw-bold text-dark">ĐĂNG NHẬP THẤT BẠI</h2>
+            <p class="text-muted">Đã có sự cố xảy ra khi kết nối với dịch vụ đăng nhập. Vui lòng thử lại sau.</p>
+            <hr />
+            <a href="@Url.Action("Login", "Account")" class="btn btn-outline-dark px-4" style="border-radius: 10px;">Quay lại Đăng nhập</a>
+        </div>
+    </div>
+</div>

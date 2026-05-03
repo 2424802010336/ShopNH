@@ -1,0 +1,431 @@
+﻿@using PagedList.Mvc
+@model PagedList.IPagedList<WebApplication2.Models.Book>
+@{
+    ViewBag.Title = "Cửa Hàng Dụng Cụ Thể Thao - SHOP NH";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    string currentGrp = Request.QueryString["group"] ?? "";
+}
+
+<style>
+    /* Sidebar hiện đại */
+    .filter-sidebar {
+        position: sticky;
+        top: 20px;
+        background: #fff;
+        border-radius: 12px;
+        padding: 5px;
+    }
+
+    .filter-section {
+        border-bottom: 1px solid #f1f1f1;
+        padding: 20px 0;
+    }
+
+        .filter-section:last-child {
+            border-bottom: none;
+        }
+
+        .filter-section h6 {
+            font-size: 14px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+    /* Scroll list */
+    .scroll-list {
+        max-height: 180px;
+        overflow-y: auto;
+        padding-right: 5px;
+    }
+
+        .scroll-list::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .scroll-list::-webkit-scrollbar-thumb {
+            background: #ff8c00;
+            border-radius: 10px;
+        }
+
+    /* Tùy chỉnh Checkbox/Radio màu cam */
+    .form-check-input {
+        cursor: pointer;
+        width: 18px;
+        height: 18px;
+    }
+
+        .form-check-input:checked {
+            background-color: #ff8c00;
+            border-color: #ff8c00;
+        }
+
+    .form-check-label {
+        font-size: 14px;
+        color: #444;
+        cursor: pointer;
+        padding-left: 5px;
+    }
+
+    /* Banner & Layout */
+    .category-banner-container {
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 20px;
+    }
+
+    .category-banner-img {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+
+    /* Badge "Bạn chọn" giống mẫu */
+    .badge-filter {
+        background-color: #e85222;
+        color: white;
+        padding: 5px 12px;
+        border-radius: 4px;
+        font-size: 13px;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+        .badge-filter i {
+            cursor: pointer;
+            font-size: 11px;
+        }
+
+    /* Phân trang */
+    .custom-pagination .page-item {
+        margin: 0 3px;
+    }
+
+        .custom-pagination .page-item a, .custom-pagination .page-item span {
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px !important;
+            font-weight: 600;
+            color: #555;
+            text-decoration: none;
+            border: 1px solid #eee;
+        }
+
+        .custom-pagination .page-item.active span {
+            background: #ff8c00 !important;
+            color: #fff !important;
+            border-color: #ff8c00 !important;
+        }
+
+    /* Hiệu ứng loading */
+    .loading-overlay {
+        opacity: 0.5;
+        pointer-events: none;
+        transition: opacity 0.3s;
+    }
+</style>
+
+<div class="container-fluid bg-white">
+    <div class="container py-3">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb" style="font-size: 13px;">
+                <li class="breadcrumb-item"><a href="/" class="text-decoration-none text-muted">Trang chủ</a></li>
+                <li class="breadcrumb-item active text-dark fw-bold">Danh mục sản phẩm</li>
+            </ol>
+        </nav>
+
+        <div class="row">
+            @* --- SIDEBAR --- *@
+            <div class="col-md-3 pe-md-4 border-end">
+                <div class="filter-sidebar">
+                    @* 0. KHU VỰC TIÊU CHÍ ĐÃ CHỌN *@
+                    <div id="selected-filters-area" class="filter-section border-0 d-none">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="fw-bold text-danger" style="font-size: 18px;">Bạn chọn</span>
+                            <a href="javascript:void(0)" onclick="clearAllFilters()" class="text-dark small text-decoration-none fw-bold">Bỏ hết <i class="fa-solid fa-xmark"></i></a>
+                        </div>
+                        <div class="d-flex flex-wrap gap-2 mb-3" id="tag-container"></div>
+                    </div>
+
+                    @* 1. CHỌN MỨC GIÁ (LUÔN HIỆN) *@
+                    <div class="filter-section">
+                        <h6>CHỌN MỨC GIÁ</h6>
+                        @{
+                            var ranges = new[] {
+                                new { id="p1", text="Giá dưới 500.000đ", min=0, max=500000 },
+                                new { id="p2", text="500.000đ - 1 triệu", min=500000, max=1000000 },
+                                new { id="p3", text="1 - 2 triệu", min=1000000, max=2000000 },
+                                new { id="p4", text="2 - 3 triệu", min=2000000, max=3000000 },
+                                new { id="p5", text="Giá trên 3 triệu", min=3000000, max=20000000 }
+                            };
+                        }
+                        @foreach (var p in ranges)
+                        {
+                            <div class="form-check mb-2">
+                                <input class="form-check-input price-filter" type="radio" name="priceRange"
+                                       data-min="@p.min" data-max="@p.max" data-text="@p.text" id="@p.id">
+                                <label class="form-check-label" for="@p.id">@p.text</label>
+                            </div>
+                        }
+                        <a href="javascript:void(0)" class="text-primary small text-decoration-none fw-bold mt-2 d-inline-block" id="btnClearPrice">Xóa lọc giá</a>
+                    </div>
+
+                    @* 2. THƯƠNG HIỆU (LUÔN HIỆN) *@
+                    <div class="filter-section">
+                        <h6>THƯƠNG HIỆU</h6>
+                        <div class="scroll-list">
+                            @foreach (var brand in new[] { "Yonex", "Lining", "VS", "Victor", "Mizuno" })
+                            {
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input brand-filter" type="checkbox" value="@brand" id="b-@brand">
+                                    <label class="form-check-label" for="b-@brand">@brand</label>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    @* 3. LỌC THEO ĐỐI TƯỢNG (HIỆN CHO GIÀY, ÁO, QUẦN, TÚI, BALO) *@
+                    @if (new[] { "Giay", "Ao", "Quan", "Vay", "TuiVot", "Balo" }.Contains(currentGrp))
+                    {
+                        <div class="filter-section">
+                            <h6>ĐỐI TƯỢNG</h6>
+                            @foreach (var sex in new[] { "Nam", "Nữ", "Unisex" })
+                            {
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input spec-filter" type="checkbox" value="@sex" id="sex-@sex">
+                                    <label class="form-check-label" for="sex-@sex">@sex</label>
+                                </div>
+                            }
+                        </div>
+                    }
+
+                    @* 4. THÔNG SỐ RIÊNG TỪNG MỤC *@
+                    @if (currentGrp == "Vot")
+                    {
+                        <div class="filter-section">
+                            <h6>THÔNG SỐ VỢT</h6>
+                            <label class="small fw-bold text-muted mb-2">Trọng lượng</label>
+                            @foreach (var w in new[] { "2U", "3U", "4U", "5U", "F" })
+                            {
+                                <div class="form-check mb-1"><input class="form-check-input spec-filter" type="checkbox" value="@w" id="w-@w"><label class="form-check-label" for="w-@w">@w</label></div>
+                            }
+                        </div>
+                    }
+
+                    @if (currentGrp == "Giay")
+                    {
+                        <div class="filter-section">
+                            <h6>SIZE GIÀY</h6>
+                            <div class="scroll-list">
+                                @for (int i = 36; i <= 45; i++)
+                                {
+                                    <div class="form-check mb-2"><input class="form-check-input spec-filter" type="checkbox" value="@i" id="sz-@i"><label class="form-check-label" for="sz-@i">@i</label></div>
+                                }
+                            </div>
+                        </div>
+                        <div class="filter-section">
+                            <h6>FORM GIÀY</h6>
+                            <div class="form-check mb-2"><input class="form-check-input spec-filter" type="checkbox" value="Slim" id="f-slim"><label class="form-check-label" for="f-slim">Slim (Bàn chân thon)</label></div>
+                            <div class="form-check mb-2"><input class="form-check-input spec-filter" type="checkbox" value="Unisex" id="f-uni"><label class="form-check-label" for="f-uni">Unisex (Bàn chân thường)</label></div>
+                            <div class="form-check mb-2"><input class="form-check-input spec-filter" type="checkbox" value="Wide" id="f-wide"><label class="form-check-label" for="f-wide">Wide (Bàn chân bè)</label></div>
+                        </div>
+                    }
+
+                    @if (new[] { "Ao", "Quan", "Vay" }.Contains(currentGrp))
+                    {
+                        <div class="filter-section">
+                            <h6>SIZE SẢN PHẨM</h6>
+                            @foreach (var size in new[] { "S", "M", "L", "XL", "2XL", "3XL" })
+                            {
+                                <div class="form-check mb-2"><input class="form-check-input spec-filter" type="checkbox" value="@size" id="size-@size"><label class="form-check-label" for="size-@size">@size</label></div>
+                            }
+                        </div>
+                    }
+
+                    @if (currentGrp == "TuiVot")
+                    {
+                        <div class="filter-section">
+                            <h6>THỂ LOẠI TÚI</h6>
+                            <div class="form-check mb-2"><input class="form-check-input spec-filter" type="checkbox" value="Ngang vai" id="t-nv"><label class="form-check-label" for="t-nv">Đeo ngang vai</label></div>
+                            <div class="form-check mb-2"><input class="form-check-input spec-filter" type="checkbox" value="Trên lưng" id="t-tl"><label class="form-check-label" for="t-tl">Đeo trên lưng</label></div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            @* --- DANH SÁCH SẢN PHẨM --- *@
+            <div class="col-md-9 ps-md-4">
+                <div class="category-banner-container shadow-sm">
+                    <img src="~/Content/Images/Banner/banner3.jpg" class="category-banner-img" onerror="this.src='https://placehold.co/1200x400?text=CHUYEN+DO+CAU+LONG+CHINH+HANG'">
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-4">
+                    <h5 class="fw-bold m-0 text-dark text-uppercase">@(ViewBag.GroupName ?? "Sản phẩm")</h5>
+                    <div class="d-flex align-items-center">
+                        <select id="sortOrder" class="form-select form-select-sm fw-bold border-0 bg-light" style="width: 170px;">
+                            <option value="default">Mặc định</option>
+                            <option value="price_asc">Giá thấp - cao</option>
+                            <option value="price_desc">Giá cao - thấp</option>
+                        </select>
+                    </div>
+                </div>
+
+                @* VÙNG CẬP NHẬT AJAX *@
+                <div id="productListContainer">
+                    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var item in Model)
+                            {
+                                <div class="col">@Html.Partial("_ProductCard", item)</div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="col-12 text-center py-5"><p class="text-muted fw-bold">Không tìm thấy sản phẩm nào khớp với bộ lọc.</p></div>
+                        }
+                    </div>
+
+                    <div class="mt-5 ajax-pagination">
+                        @Html.PagedListPager(Model, page => Url.Action("Category", new { page, group = Request.QueryString["group"], brand = Request.QueryString["brand"], sort = Request.QueryString["sort"], minPrice = Request.QueryString["minPrice"], maxPrice = Request.QueryString["maxPrice"], spec = Request.QueryString["spec"] }),
+                        new PagedListRenderOptions
+                             {
+                            LiElementClasses = new string[] { "page-item" },
+                            UlElementClasses = new string[] { "pagination justify-content-center custom-pagination" }
+                        })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        $(document).ready(function () {
+            initFiltersFromUrl();
+
+            // TỰ ĐỘNG CẬP NHẬT KHI CLICK (Dùng delegation để hoạt động sau khi AJAX thay thế HTML)
+            $(document).on("change", ".brand-filter, .price-filter, .spec-filter, #sortOrder", function () {
+                applyFilters();
+            });
+
+            // Xử lý click vào phân trang
+            $(document).on("click", ".ajax-pagination a", function (e) {
+                e.preventDefault();
+                var url = $(this).attr("href");
+                if (url) fetchData(url);
+            });
+
+            renderFilterTags();
+        });
+
+        function initFiltersFromUrl() {
+            var urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('sort')) $("#sortOrder").val(urlParams.get('sort'));
+            var brands = urlParams.get('brand');
+            if (brands) brands.split(',').forEach(b => $(".brand-filter[value='" + b + "']").prop('checked', true));
+            var specs = urlParams.get('spec');
+            if (specs) specs.split(',').forEach(s => $(".spec-filter[value='" + s + "']").prop('checked', true));
+            var minP = urlParams.get('minPrice');
+            if (minP !== null) $(".price-filter[data-min='" + minP + "']").prop('checked', true);
+        }
+
+        function getURLParams() {
+            var params = {};
+            var search = window.location.search.substring(1);
+            if (search) {
+                var parts = search.split('&');
+                for (var i = 0; i < parts.length; i++) {
+                    var pair = parts[i].split('=');
+                    params[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1]);
+                }
+            }
+            return params;
+        }
+
+        function applyFilters() {
+            var params = getURLParams();
+            var brands = $(".brand-filter:checked").map(function() { return this.value; }).get().join(",");
+            if (brands) params["brand"] = brands; else delete params["brand"];
+
+            var specs = $(".spec-filter:checked").map(function() { return this.value; }).get().join(",");
+            if (specs) params["spec"] = specs; else delete params["spec"];
+
+            params["sort"] = $("#sortOrder").val();
+
+            var $price = $(".price-filter:checked");
+            if ($price.length) {
+                params["minPrice"] = $price.data("min");
+                params["maxPrice"] = $price.data("max");
+            } else {
+                delete params["minPrice"]; delete params["maxPrice"];
+            }
+            params["page"] = 1;
+
+            var newUrl = '@Url.Action("Category", "Store")?' + $.param(params);
+            fetchData(newUrl);
+        }
+
+        function fetchData(url) {
+            $("#productListContainer").addClass("loading-overlay");
+            window.history.pushState({ path: url }, '', url);
+
+            $.get(url, function (data) {
+                var html = $(data).find("#productListContainer").html();
+                $("#productListContainer").html(html);
+                $("#productListContainer").removeClass("loading-overlay");
+                renderFilterTags();
+                $('html, body').animate({ scrollTop: $(".category-banner-container").offset().top - 20 }, 300);
+            });
+        }
+
+        function renderFilterTags() {
+            var urlParams = new URLSearchParams(window.location.search);
+            var container = $("#tag-container").empty();
+            var hasFilter = false;
+
+            var brands = urlParams.get('brand');
+            if (brands) brands.split(',').forEach(b => {
+                container.append(`<span class="badge-filter"><i class="fa-solid fa-xmark" onclick="removeSingleFilter('brand','${b}')"></i> ${b}</span>`);
+                hasFilter = true;
+            });
+
+            var specs = urlParams.get('spec');
+            if (specs) specs.split(',').forEach(s => {
+                container.append(`<span class="badge-filter"><i class="fa-solid fa-xmark" onclick="removeSingleFilter('spec','${s}')"></i> ${s}</span>`);
+                hasFilter = true;
+            });
+
+            var minP = urlParams.get('minPrice');
+            if (minP) {
+                var priceText = $(".price-filter[data-min='" + minP + "']").data('text') || "Mức giá";
+                container.append(`<span class="badge-filter"><i class="fa-solid fa-xmark" onclick="removeSingleFilter('price')"></i> ${priceText}</span>`);
+                hasFilter = true;
+            }
+
+            $("#selected-filters-area").toggleClass("d-none", !hasFilter);
+        }
+
+        function removeSingleFilter(type, value) {
+            if (type === 'brand') $(".brand-filter[value='" + value + "']").prop('checked', false).trigger('change');
+            else if (type === 'spec') $(".spec-filter[value='" + value + "']").prop('checked', false).trigger('change');
+            else { $(".price-filter").prop('checked', false); applyFilters(); }
+        }
+
+        function clearAllFilters() {
+            $(".brand-filter, .spec-filter, .price-filter").prop('checked', false);
+            applyFilters();
+        }
+
+        $("#btnClearPrice").click(function() {
+            $(".price-filter").prop('checked', false);
+            applyFilters();
+        });
+    </script>
+}

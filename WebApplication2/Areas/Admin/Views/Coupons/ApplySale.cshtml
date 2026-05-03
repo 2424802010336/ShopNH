@@ -1,0 +1,101 @@
+﻿@model IEnumerable<WebApplication2.Models.Book>
+@{
+    ViewBag.Title = "Thiết lập ưu đãi";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    var coupons = ViewBag.Coupons as List<WebApplication2.Models.Coupon> ?? new List<WebApplication2.Models.Coupon>();
+}
+
+<div class="container-fluid py-4 text-dark">
+    <h2 class="fw-bold mb-4 text-dark"><i class="fa-solid fa-tags me-2 text-danger"></i>THIẾT LẬP ƯU ĐÃI</h2>
+
+    @using (Html.BeginForm("ExecuteApplySale", "Coupons", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card p-4 rounded-4 shadow border-0 bg-white mb-4 text-center">
+                    <h5 class="fw-bold text-dark mb-3 text-start">BƯỚC 1: CHỌN MÃ</h5>
+                    <select name="couponId" id="couponSelect" class="form-select form-select-lg mb-3 shadow-none border-primary" required>
+                        <option value="">-- Chọn Voucher --</option>
+                        @foreach (var cp in (ViewBag.Coupons as List<WebApplication2.Models.Coupon>))
+                        {
+                            <option value="@cp.Id">@cp.Code (-@cp.DiscountPercent%)</option>
+}
+                    </select>
+
+                    @* Nút Xác nhận áp dụng *@
+                    <button type="submit" id="btnConfirm" class="btn btn-danger btn-lg w-100 rounded-pill shadow fw-bold mb-2" disabled>
+                        XÁC NHẬN ÁP DỤNG
+                    </button>
+
+                    @* NÚT QUAY LẠI TRANG VOUCHER *@
+                    <a href="@Url.Action("Index", "Coupons")" class="btn btn-outline-secondary w-100 rounded-pill fw-bold">
+                        <i class="fa-solid fa-rotate-left me-2"></i> QUAY LẠI VOUCHER
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-8">
+                <div class="card rounded-4 shadow border-0 overflow-hidden bg-white">
+                    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                        <h5 class="m-0 fw-bold">BƯỚC 2: CHỌN SẢN PHẨM</h5>
+                        <div class="form-check m-0">
+                            <input type="checkbox" id="checkAll" class="form-check-input">
+                            <label class="form-check-label text-white" for="checkAll">Tất cả</label>
+                        </div>
+                    </div>
+                    <div class="table-responsive" style="max-height: 500px;">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="text-center" width="80">Chọn</th>
+                                    <th>Sản phẩm</th>
+                                    <th class="text-end">Giá bán</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td class="text-center">
+                                            <input type="checkbox" name="selectedProductIds" value="@item.Id" class="product-check form-check-input">
+                                        </td>
+                                        <td>
+                                            <div class="fw-bold text-dark">@item.Title</div>
+                                            <small class="text-muted">
+                                                @* Vì Category trong Book.cs là string nên hiển thị trực tiếp *@
+                                                @(string.IsNullOrEmpty(item.Category) ? "Chưa phân loại" : item.Category)
+                                            </small>
+                                        </td>
+                                        <td class="text-end pe-4 fw-bold text-danger">@item.Price.ToString("N0") đ</td>
+                                    </tr>
+}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const btnConfirm = document.getElementById("btnConfirm");
+            const couponSelect = document.getElementById("couponSelect");
+            const checkboxes = document.querySelectorAll('input[name="selectedProductIds"]');
+
+            function checkForm() {
+                let isProductSelected = Array.from(checkboxes).some(c => c.checked);
+                let isCouponSelected = couponSelect.value !== "";
+
+                // Chỉ bật nút khi đã chọn cả 2
+                btnConfirm.disabled = !(isProductSelected && isCouponSelected);
+            }
+
+            couponSelect.addEventListener("change", checkForm);
+            checkboxes.forEach(c => c.addEventListener("change", checkForm));
+        });
+    </script>
+}

@@ -1,0 +1,71 @@
+﻿@model WebApplication2.Models.News
+@{
+    ViewBag.Title = "Sửa tin tức";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="card border-0 shadow-lg rounded-4">
+    <div class="card-header bg-dark py-3">
+        <h4 class="fw-bold m-0 text-white">
+            <i class="fa-solid fa-pen-to-square me-2 text-warning"></i>CHỈNH SỬA TIN TỨC
+        </h4>
+    </div>
+    <div class="card-body p-4">
+        @* Cần thêm enctype để upload được file ảnh *@
+        @using (Html.BeginForm("Edit", "News", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(model => model.Id)
+            @Html.HiddenFor(model => model.CreatedDate)
+            @* Quan trọng: Giữ lại đường dẫn ảnh cũ nếu không thay đổi *@
+            @Html.HiddenFor(model => model.ImagePath)
+
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="mb-3">
+                        <label class="fw-bold mb-1">Tiêu đề</label>
+                        @Html.EditorFor(model => model.Title, new { htmlAttributes = new { @class = "form-control rounded-3" } })
+                    </div>
+
+                    @* CHỌN ẢNH MỚI *@
+                    <div class="mb-3">
+                        <label class="fw-bold mb-1">Thay đổi hình ảnh (Nếu muốn)</label>
+                        <input type="file" name="uploadImage" class="form-control rounded-3" accept="image/*" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="fw-bold mb-1">Mô tả ngắn</label>
+                        @Html.TextAreaFor(model => model.ShortDescription, new { @class = "form-control rounded-3", rows = "3" })
+                    </div>
+                    <div class="mb-3">
+                        <label class="fw-bold mb-1">Nội dung</label>
+                        @Html.TextAreaFor(model => model.Content, new { @class = "form-control rounded-3", rows = "8" })
+                    </div>
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-warning px-4 rounded-pill fw-bold text-dark">Cập nhật</button>
+                        <a href="@Url.Action("Index")" class="btn btn-light px-4 rounded-pill border ms-2">Hủy bỏ</a>
+                    </div>
+                </div>
+
+                <div class="col-md-4 text-center border-start">
+                    <label class="fw-bold mb-2">Ảnh hiện tại</label>
+                    <div class="rounded-4 overflow-hidden border shadow-sm mx-auto" style="max-width: 300px; min-height: 100px; background: #f8f9fa; display: flex; align-items: center; justify-content: center;">
+                        @* Sửa lỗi: Kiểm tra ImagePath trước khi dùng Url.Content *@
+                        @if (Model != null && !string.IsNullOrEmpty(Model.ImagePath))
+                        {
+                            <img src="@Url.Content(Model.ImagePath)" class="w-100" id="previewImg">
+                        }
+                        else
+                        {
+                            <div class="p-4 text-muted small">
+                                <i class="fa-solid fa-image fa-2x d-block mb-2"></i>
+                                Chưa có ảnh
+                            </div>
+                        }
+                    </div>
+                    <p class="mt-2 text-muted small">Ngày đăng: @Model.CreatedDate.ToString("dd/MM/yyyy HH:mm")</p>
+                </div>
+            </div>
+        }
+    </div>
+</div>

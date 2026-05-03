@@ -1,0 +1,42 @@
+﻿@model WebApplication2.Models.IndexViewModel
+@{ ViewBag.Title = "Hồ sơ cá nhân"; }
+
+<div class="container py-4">
+    <h2 class="fw-bold" style="color: #ff8c00;"><i class="fa-solid fa-user-gear"></i> QUẢN LÝ TÀI KHOẢN</h2>
+    <p class="text-success">@ViewBag.StatusMessage</p>
+
+    <div class="card shadow-sm border-0" style="border-radius: 20px;">
+        <div class="card-body p-4">
+            <h4 class="fw-bold mb-4">Cài đặt bảo mật</h4>
+            <hr />
+            <div class="row mb-3">
+                <div class="col-md-3 fw-bold text-muted"><i class="fa-solid fa-key"></i> Mật khẩu:</div>
+                <div class="col-md-9">
+                    @if (Model.HasPassword)
+                    {
+                        @Html.ActionLink("Đổi mật khẩu", "ChangePassword", null, new { @class = "btn btn-sm btn-outline-warning" })
+                    }
+                    else
+                    {
+                        @Html.ActionLink("Tạo mật khẩu", "SetPassword", null, new { @class = "btn btn-sm btn-warning" })
+                    }
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-3 fw-bold text-muted"><i class="fa-solid fa-phone"></i> Số điện thoại:</div>
+                <div class="col-md-9">
+                    @(Model.PhoneNumber ?? "Chưa cập nhật")
+                    @Html.ActionLink(Model.PhoneNumber != null ? "Thay đổi" : "Thêm mới", "AddPhoneNumber", null, new { @class = "btn btn-sm btn-link text-orange", style = "color: #ff8c00;" })
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-3 fw-bold text-muted"><i class="fa-solid fa-shield-halved"></i> Xác thực 2 lớp:</div>
+                <div class="col-md-9 text-muted small">
+                    Tính năng này đang được bảo trì.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

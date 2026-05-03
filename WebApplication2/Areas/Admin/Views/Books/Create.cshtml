@@ -1,0 +1,231 @@
+﻿@model WebApplication2.Models.Book
+@{
+    ViewBag.Title = "Thêm sản phẩm mới";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="card shadow-lg border-0 rounded-4 p-4">
+    <h2 class="fw-bold text-primary mb-4 text-uppercase">Thêm sản phẩm mới</h2>
+
+    @using (Html.BeginForm("Create", "Books", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        @Html.AntiForgeryToken()
+
+        <div class="row">
+            @* CỘT TRÁI: THÔNG TIN CHI TIẾT *@
+            <div class="col-md-8">
+                @* 1. Tên sản phẩm *@
+                <div class="mb-3">
+                    <label class="fw-bold">Tên sản phẩm</label>
+                    @Html.EditorFor(model => model.Title, new { htmlAttributes = new { @class = "form-control", placeholder = "Nhập tên sản phẩm..." } })
+                </div>
+
+                <div class="row">
+                    @* 2. Danh mục chính *@
+                    <div class="col-md-6 mb-3">
+                        <label class="fw-bold">Chọn danh mục chính</label>
+                        <select name="CategoryGroup" id="CategoryGroup" class="form-select border-primary fw-bold" onchange="toggleFields()" required>
+                            <option value="">-- Chọn danh mục --</option>
+                            <option value="Vot">Vợt cầu lông</option>
+                            <option value="Giay">Giày cầu lông</option>
+                            <option value="Ao">Áo cầu lông</option>
+                            <option value="Quan">Quần cầu lông</option>
+                            <option value="Vay">Váy cầu lông</option>
+                            <option value="TuiVot">Túi vợt</option>
+                            <option value="Balo">Balo cầu lông</option>
+                            <option value="PhuKien">Phụ kiện</option>
+                        </select>
+                    </div>
+
+                    @* 3. Thương hiệu (Sẽ ẩn nếu là Phụ kiện) *@
+                    <div class="col-md-6 mb-3" id="brand-area">
+                        <label class="fw-bold">Thương hiệu</label>
+                        <select name="Brand" id="Brand" class="form-select border-primary">
+                            <option value="">-- Chọn thương hiệu --</option>
+                            <option value="Yonex">Yonex</option>
+                            <option value="Lining">Lining</option>
+                            <option value="VS">VS</option>
+                            <option value="Victor">Victor</option>
+                            <option value="Mizuno">Mizuno</option>
+                        </select>
+                    </div>
+
+                    @* 4. Phân loại chi tiết (Hiện khi chọn Phụ kiện / Túi) *@
+                    <div class="col-md-6 mb-3" id="sub-category-area" style="display:none;">
+                        <label class="fw-bold text-success">Phân loại chi tiết</label>
+                        <select name="SubCategory" id="SubCategory" class="form-select border-success fw-bold">
+                            @* JS render *@
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    @* 5. Giá bán *@
+                    <div class="col-md-6 mb-3">
+                        <label class="fw-bold">Giá niêm yết (đ)</label>
+                        @Html.EditorFor(model => model.Price, new { htmlAttributes = new { @class = "form-control", type = "number" } })
+                    </div>
+
+                    @* 6. Đối tượng (Hiện cho hầu hết trừ Phụ kiện) *@
+                    <div class="col-md-6 mb-3" id="target-area">
+                        <label class="fw-bold">Đối tượng sử dụng</label>
+                        <select name="Target" class="form-select border-primary">
+                            <option value="Unisex">Unisex (Cả nam và nữ)</option>
+                            <option value="Nam">Nam</option>
+                            <option value="Nữ">Nữ</option>
+                        </select>
+                    </div>
+                </div>
+
+                @* KHU VỰC THÔNG SỐ RIÊNG (ẨN/HIỆN THEO JS) *@
+
+                @* Thông số cho Vợt *@
+                <div id="fields-vot" class="extra-fields border p-3 rounded-3 mb-3 shadow-sm" style="display:none; background: #f8f9fa;">
+                    <h6 class="text-primary fw-bold border-bottom pb-2"><i class="fa-solid fa-gauge-high"></i> THÔNG SỐ VỢT</h6>
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <label class="small fw-bold">Trọng lượng (Ví dụ: 4U, 3U...)</label>
+                            <input type="text" name="Weight" class="form-control" placeholder="Nhập trọng lượng">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label class="small fw-bold">Điểm Swingweight</label>
+                            <input type="text" name="SwingWeight" class="form-control" placeholder="Ví dụ: 84 kg/cm2">
+                        </div>
+                    </div>
+                </div>
+
+                @* Thông số Size cho Giày / Áo / Quần / Váy *@
+                <div id="fields-size" class="extra-fields border p-3 rounded-3 mb-3 shadow-sm" style="display:none; background: #f8f9fa;">
+                    <h6 class="text-primary fw-bold border-bottom pb-2"><i class="fa-solid fa-ruler"></i> SIZE VÀ KÍCH THƯỚC</h6>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <label class="small fw-bold" id="size-label">Danh sách Size (cách nhau dấu phẩy)</label>
+                            <input type="text" name="SizeList" class="form-control" placeholder="Ví dụ: S, M, L hoặc 39, 40, 41">
+                        </div>
+                    </div>
+                </div>
+
+                @* Thông số Form cho Giày *@
+                <div id="fields-form-giay" class="extra-fields border p-3 rounded-3 mb-3 shadow-sm" style="display:none; background: #fff3e0;">
+                    <h6 class="text-warning fw-bold border-bottom pb-2"><i class="fa-solid fa-shoe-prints"></i> FORM GIÀY</h6>
+                    <select name="FormType" class="form-select">
+                        <option value="Unisex">Unisex (Bàn chân thường)</option>
+                        <option value="Slim">Slim (Bàn chân thon gọn)</option>
+                        <option value="Wide">Wide (Bàn chân bè)</option>
+                    </select>
+                </div>
+
+                @* 7. Mô tả sản phẩm *@
+                <div class="mb-3">
+                    <label class="fw-bold">Mô tả sản phẩm</label>
+                    @Html.TextAreaFor(model => model.Description, new { @class = "form-control", rows = 5, placeholder = "Nhập mô tả chi tiết sản phẩm..." })
+                </div>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg px-5 fw-bold shadow">XÁC NHẬN THÊM</button>
+                    <a href="@Url.Action("Index")" class="btn btn-outline-secondary btn-lg px-4 ms-2">Hủy bỏ</a>
+                </div>
+            </div>
+
+            @* CỘT PHẢI: HÌNH ẢNH *@
+            <div class="col-md-4 text-center">
+                <label class="fw-bold d-block mb-2">Hình ảnh sản phẩm</label>
+                <div class="border rounded-4 p-2 mb-3 bg-light" style="min-height: 300px; display: flex; align-items: center; justify-content: center;">
+                    <img id="previewImg" src="~/Content/Images/no-image.jpg" class="img-fluid rounded-4 shadow-sm" style="max-height: 350px; object-fit: contain;">
+                </div>
+                <div class="input-group">
+                    <input type="file" name="uploadImage" class="form-control" onchange="previewFile(this)">
+                </div>
+                <small class="text-muted mt-2 d-block">Lưu ý: Ảnh nên có tỷ lệ 1:1 hoặc 3:4 để hiển thị đẹp nhất.</small>
+            </div>
+        </div>
+    }
+</div>
+
+@section scripts {
+    <script>
+        function toggleFields() {
+            var cat = document.getElementById("CategoryGroup").value;
+            var subArea = document.getElementById("sub-category-area");
+            var subSelect = document.getElementById("SubCategory");
+            var brandArea = document.getElementById("brand-area");
+            var brandSelect = document.getElementById("Brand");
+            var targetArea = document.getElementById("target-area");
+
+            // Ẩn tất cả các khu vực thông số trước khi kiểm tra
+            document.querySelectorAll('.extra-fields').forEach(el => el.style.display = 'none');
+            subArea.style.display = 'none';
+            brandArea.style.display = 'block';
+            targetArea.style.display = 'block';
+
+            // Reset danh sách thương hiệu về mặc định
+            var defaultBrands = `
+                    <option value="">-- Chọn thương hiệu --</option>
+                    <option value="Yonex">Yonex</option>
+                    <option value="Lining">Lining</option>
+                    <option value="VS">VS</option>
+                    <option value="Victor">Victor</option>
+                    <option value="Mizuno">Mizuno</option>`;
+            brandSelect.innerHTML = defaultBrands;
+
+            if (cat === "Vot") {
+                document.getElementById("fields-vot").style.display = 'block';
+            }
+            else if (cat === "Giay") {
+                document.getElementById("fields-size").style.display = 'block';
+                document.getElementById("fields-form-giay").style.display = 'block';
+                document.getElementById("size-label").innerText = "Danh sách Size Giày (Ví dụ: 39, 40, 41)";
+            }
+            else if (["Ao", "Quan", "Vay"].includes(cat)) {
+                document.getElementById("fields-size").style.display = 'block';
+                document.getElementById("size-label").innerText = "Danh sách Size Quần Áo (Ví dụ: S, M, L, XL)";
+                if (cat === "Vay") {
+                    // Váy thường chỉ dành cho Nữ
+                    targetArea.querySelector('select').value = "Nữ";
+                }
+            }
+            else if (cat === "TuiVot") {
+                subArea.style.display = 'block';
+                subSelect.innerHTML = `
+                        <option value="NgangVai">Đeo ngang vai</option>
+                        <option value="TrenLung">Đeo trên lưng (Balo túi)</option>`;
+                // Túi thường chỉ giới hạn một số hãng
+                brandSelect.innerHTML = `
+                        <option value="">-- Chọn thương hiệu --</option>
+                        <option value="Yonex">Yonex</option>
+                        <option value="Lining">Lining</option>
+                        <option value="Victor">Victor</option>`;
+            }
+            else if (cat === "Balo") {
+                brandSelect.innerHTML = `
+                        <option value="">-- Chọn thương hiệu --</option>
+                        <option value="Yonex">Yonex</option>
+                        <option value="Lining">Lining</option>
+                        <option value="Victor">Victor</option>`;
+            }
+            else if (cat === "PhuKien") {
+                brandSelect.value = "";
+                subArea.style.display = 'block';
+                targetArea.style.display = 'none'; // Phụ kiện thường không phân biệt Nam/Nữ
+                subSelect.innerHTML = `
+                        <option value="Vo">Vớ cầu lông</option>
+                        <option value="QuanCan">Quấn cán vợt</option>
+                        <option value="QuaCau">Quả cầu lông</option>
+                        <option value="Cuoc">Cước căng vợt</option>
+                        <option value="ChanMoHoi">Băng chặn mồ hôi</option>
+                        <option value="NuocRuaGiay">Nước rửa giày</option>`;
+            }
+        }
+
+        // Preview ảnh khi chọn file
+        function previewFile(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById("previewImg").src = e.target.result;
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
+}

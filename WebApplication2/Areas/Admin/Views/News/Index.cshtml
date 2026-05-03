@@ -1,0 +1,135 @@
+﻿@model IEnumerable<WebApplication2.Models.News>
+
+@{
+    ViewBag.Title = "Quản lý Tin tức";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+    @* --- Header của Card: Chỉnh lại màu sắc và font chữ --- *@
+    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center border-bottom">
+        <h5 class="fw-bold m-0 text-dark">
+            <i class="fa-solid fa-newspaper me-2 text-primary"></i>DANH SÁCH TIN TỨC
+        </h5>
+        <a href="@Url.Action("Create")" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">
+            <i class="fa-solid fa-plus me-2"></i>Thêm bài viết
+        </a>
+    </div>
+
+    @* --- Thân Card --- *@
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4" style="width: 120px;">Ảnh bìa</th>
+                        <th>Nội dung bài viết</th>
+                        <th style="width: 180px;">Thời gian đăng</th>
+                        <th class="text-center" style="width: 160px;">Tùy chọn</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="ps-4">
+                                <div class="rounded-3 border shadow-sm bg-light d-flex align-items-center justify-content-center"
+                                     style="width: 90px; height: 60px; overflow: hidden;">
+                                    @if (!string.IsNullOrEmpty(item.ImagePath))
+                                    {
+                                        <img src="@Url.Content(item.ImagePath)"
+                                             class="w-100 h-100" style="object-fit: cover;"
+                                             onerror="this.src='https://placehold.co/90x60?text=No+Image'">
+                                    }
+                                    else
+                                    {
+                                        <i class="fa-solid fa-image text-muted"></i>
+                                    }
+                                </div>
+                            </td>
+                            <td>
+                                <div class="fw-bold text-dark mb-1 text-truncate" style="max-width: 450px;" title="@item.Title">
+                                    @item.Title
+                                </div>
+                                <div class="text-muted small text-truncate" style="max-width: 450px;">
+                                    @item.ShortDescription
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex flex-column">
+                                    <span class="small fw-bold text-dark">
+                                        <i class="fa-regular fa-calendar-check me-1 text-secondary"></i>
+                                        @item.CreatedDate.ToString("dd/MM/yyyy")
+                                    </span>
+                                    <span class="text-muted" style="font-size: 0.75rem;">
+                                        <i class="fa-regular fa-clock me-1"></i> @item.CreatedDate.ToString("HH:mm")
+                                    </span>
+                                </div>
+                            </td>
+                            <td class="text-center pe-3">
+                                <div class="btn-group shadow-sm border rounded-pill bg-white px-2">
+                                    <a href="@Url.Action("Edit", new { id = item.Id })"
+                                       class="btn btn-link btn-sm text-primary p-2" title="Sửa nội dung">
+                                        <i class="fa-solid fa-pen-to-square"></i>
+                                    </a>
+                                    <a href="@Url.Action("Details", new { id = item.Id })"
+                                       class="btn btn-link btn-sm text-info p-2" title="Xem chi tiết">
+                                        <i class="fa-solid fa-circle-info"></i>
+                                    </a>
+                                    <a href="@Url.Action("Delete", new { id = item.Id })"
+                                       class="btn btn-link btn-sm text-danger p-2" title="Xóa bài">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (!Model.Any())
+        {
+            <div class="text-center py-5 bg-light">
+                <img src="https://cdn-icons-png.flaticon.com/512/7486/7486744.png" width="80" class="mb-3 opacity-50">
+                <p class="text-muted fw-bold">Hiện chưa có tin tức nào được đăng tải.</p>
+                <a href="@Url.Action("Create")" class="btn btn-outline-primary btn-sm rounded-pill">Đăng bài ngay</a>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    /* Bảng mượt mà hơn */
+    .table thead th {
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 700;
+        border-top: none;
+    }
+
+    .table-hover tbody tr {
+        transition: all 0.2s ease-in-out;
+    }
+
+        .table-hover tbody tr:hover {
+            background-color: #f0f4ff !important;
+            transform: scale(1.002);
+        }
+
+    /* Tinh chỉnh nhóm nút */
+    .btn-group .btn-link {
+        text-decoration: none;
+        transition: transform 0.2s;
+    }
+
+        .btn-group .btn-link:hover {
+            transform: scale(1.2);
+        }
+
+    /* Hiệu ứng ảnh */
+    img {
+        transition: opacity 0.3s;
+    }
+</style>

@@ -1,0 +1,155 @@
+﻿@using System.Web.Optimization
+@using System.Web.Mvc
+@using System.Web.Mvc.Html
+@using System.Web.Optimization
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏆 Admin Dashboard - SHOP NH</title>
+    @Styles.Render("~/Content/css")
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --sidebar-bg: #0f101a;
+            --content-bg: #161724;
+            --accent-blue: #6366f1;
+        }
+
+        body {
+            display: flex;
+            background-color: var(--content-bg);
+            margin: 0;
+            font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+            color: #fff;
+        }
+
+        #sidebar {
+            min-width: 260px;
+            max-width: 260px;
+            background: var(--sidebar-bg);
+            height: 100vh;
+            position: fixed;
+            z-index: 100;
+            border-right: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .sidebar-header {
+            padding: 30px 25px;
+            font-size: 1.2rem;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+            /* Link quay về trang khách hàng */
+            .sidebar-header a {
+                text-decoration: none;
+                color: #fff;
+                transition: 0.3s;
+            }
+
+                .sidebar-header a:hover {
+                    color: var(--accent-blue);
+                }
+
+        #sidebar ul li a {
+            padding: 12px 25px;
+            display: flex;
+            align-items: center;
+            color: #8e94a9;
+            text-decoration: none;
+            transition: 0.2s;
+            font-weight: 500;
+            border-left: 3px solid transparent;
+        }
+
+            #sidebar ul li a:hover, #sidebar ul li.active a {
+                background: rgba(99, 102, 241, 0.1);
+                color: #fff;
+                border-left-color: var(--accent-blue);
+            }
+
+            #sidebar ul li a i {
+                margin-right: 15px;
+                width: 20px;
+                text-align: center;
+            }
+
+        #content {
+            margin-left: 260px;
+            width: calc(100% - 260px);
+            padding: 25px;
+            min-height: 100vh;
+        }
+
+        .admin-main-view {
+            background: #f4f7fe;
+            border-radius: 25px;
+            min-height: calc(100vh - 50px);
+            padding: 30px;
+            color: #333;
+        }
+
+        .logout-btn {
+            color: #ff4d4d;
+            background: transparent;
+            border: none;
+            width: 100%;
+            text-align: left;
+            padding: 15px 25px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <nav id="sidebar">
+        <div class="sidebar-header">
+            @* Link nhảy qua trang khách hàng *@
+            <a href="@Url.Action("Index", "Home", new { area = "" })">
+                <i class="fa-solid fa-bolt me-2 text-warning"></i> SHOP NH ADMIN
+            </a>
+        </div>
+
+        <ul class="list-unstyled">
+            <li><a href="@Url.Action("AdminDashboard", "Books")"><i class="fa-solid fa-chart-pie"></i> Dashboard</a></li>
+            <li><a href="@Url.Action("Index", "Books")"><i class="fa-solid fa-box"></i> Sản phẩm</a></li>
+            <li><a href="@Url.Action("Index", "Order")"><i class="fa-solid fa-cart-shopping"></i> Đơn hàng</a></li>
+            <li><a href="@Url.Action("Index", "Coupons", new { area = "Admin" })"><i class="fa-solid fa-ticket"></i> Quản lý Voucher</a></li>
+            <li>
+                <a href="@Url.Action("Index", "News", new { area = "Admin" })">
+                    <i class="fa-solid fa-newspaper"></i> Quản lý Tin tức
+                </a>
+            </li>
+            <li>
+                <a href="@Url.Action("ManageAdmins", "User", new { area = "Admin" })">
+                    <i class="fa-solid fa-user-shield"></i> Quản trị Admin
+                </a>
+            </li>
+            <li>
+                <a href="@Url.Action("ManageCustomers", "User", new { area = "Admin" })">
+                    <i class="fa-solid fa-users-gear"></i> Quản lý Khách hàng
+                </a>
+            </li>
+
+            <li class="position-absolute bottom-0 w-100 mb-4">
+                @using (Html.BeginForm("LogOff", "Account", new { area = "" }, FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="logout-btn"><i class="fa-solid fa-power-off me-2"></i> Đăng xuất</button>}
+            </li>
+        </ul>
+    </nav>
+
+    <div id="content">
+        <div class="admin-main-view shadow-lg">
+            @RenderBody()
+        </div>
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @RenderSection("scripts", required: false)
+</body>
+</html>

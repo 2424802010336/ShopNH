@@ -1,0 +1,48 @@
+﻿/* 1. Đổi màu thanh menu (Navbar) thành màu cam */
+.navbar-inverse {
+    background-color: #ff8c00 !important; /* Màu cam */
+    border-color: #e67e22 !important;
+}
+
+/* Đổi màu chữ trên menu thành trắng để dễ nhìn */
+.navbar-inverse .navbar-nav > li > a,
+.navbar-inverse .navbar-brand {
+    color: #ffffff !important; 
+    font-weight: bold;
+}
+
+/* Đổi màu khi di chuột vào menu */
+.navbar-inverse .navbar-nav > li > a:hover {
+    background-color: #e67e22 !important; 
+}
+
+/* 2. Đổi nền toàn bộ trang web sang màu xám cực nhạt để làm nổi bật khung giữa */
+body {
+    background-color: #f0f2f5;
+}
+
+/* 3. Tạo khung bo góc tròn ở giữa trang */
+.custom-rounded-box {
+    background-color: #ffffff; /* Màu nền trắng cho khung */
+    border-radius: 25px;       /* Độ bo tròn góc */
+    padding: 40px;             /* Khoảng cách từ viền vào nội dung */
+    margin-top: 40px;
+    margin-bottom: 40px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); /* Đổ bóng nhẹ cho khung nổi lên */
+}
+
+/* 4. Khung nền xám cho từng Sản phẩm */
+.product-card {
+    background-color: #e9ecef; /* Màu nền xám cho sản phẩm */
+    border-radius: 15px;       /* Bo góc cho thẻ sản phẩm */
+    padding: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Hiệu ứng nảy lên nhẹ khi di chuột vào sản phẩm */
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}

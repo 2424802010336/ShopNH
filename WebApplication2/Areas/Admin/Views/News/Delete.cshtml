@@ -1,0 +1,66 @@
+﻿@model WebApplication2.Models.News
+@{
+    ViewBag.Title = "Xác nhận xóa tin tức";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="card border-0 shadow-lg rounded-4">
+    <div class="card-header bg-danger py-3 text-white">
+        <h4 class="fw-bold m-0"><i class="fa-solid fa-trash-can me-2"></i>XÁC NHẬN XÓA TIN TỨC?</h4>
+    </div>
+    <div class="card-body p-4">
+        <div class="row">
+            @* --- Phần hiển thị hình ảnh --- *@
+            <div class="col-md-4 mb-3">
+                <div class="rounded-4 overflow-hidden border shadow-sm bg-light d-flex align-items-center justify-content-center" style="min-height: 200px;">
+                    @if (Model != null && !string.IsNullOrEmpty(Model.ImagePath))
+                    {
+                        <img src="@Url.Content(Model.ImagePath)" class="w-100 h-100" style="object-fit: cover;">
+                    }
+                    else
+                    {
+                        <div class="text-center p-4 text-muted">
+                            <i class="fa-solid fa-image fa-3x mb-2 opacity-25"></i>
+                            <p class="small m-0">Không tìm thấy ảnh bài viết</p>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            @* --- Phần thông tin --- *@
+            <div class="col-md-8">
+                <h3 class="fw-bold text-dark">@Model.Title</h3>
+                <p class="text-muted small">
+                    <i class="fa-regular fa-calendar me-2 text-danger"></i>Đăng ngày: @Model.CreatedDate.ToString("dd/MM/yyyy HH:mm")
+                </p>
+                <hr>
+                <div class="p-3 bg-light rounded-3 mb-4 border-start border-danger border-4">
+                    <p class="m-0 text-secondary">@Model.ShortDescription</p>
+                </div>
+
+                @* --- FORM XÓA --- *@
+                @using (Html.BeginForm("Delete", "News", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+
+                    @* QUAN TRỌNG: Phải có dòng này thì Controller mới nhận được ID để xóa *@
+                    @Html.HiddenFor(model => model.Id)
+
+                    <div class="alert alert-warning border-0 rounded-3">
+                        <i class="fa-solid fa-triangle-exclamation me-2"></i>
+                        Hành động này không thể hoàn tác. Bạn có chắc chắn muốn xóa bài viết này?
+                    </div>
+
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-danger px-5 rounded-pill fw-bold shadow-sm">
+                            <i class="fa-solid fa-check me-2"></i>CÓ, XÁC NHẬN XÓA
+                        </button>
+                        <a href="@Url.Action("Index")" class="btn btn-light px-4 rounded-pill border ms-2">
+                            Hủy bỏ
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,13 @@
+﻿@model System.Web.Mvc.HandleErrorInfo
+@{ ViewBag.Title = "Lỗi hệ thống"; }
+
+<div class="text-center py-5">
+    <i class="fa-solid fa-triangle-exclamation fa-5x text-warning mb-4"></i>
+    <h1 class="display-4 fw-bold text-danger">Ối! Có lỗi rồi.</h1>
+    <p class="lead text-muted">Hệ thống đang gặp sự cố khi xử lý yêu cầu của bạn.</p>
+    <div class="mt-4">
+        <a href="@Url.Action("Index", "Home")" class="btn btn-lg text-white px-5" style="background-color: #ff8c00; border-radius: 15px;">
+            QUAY LẠI TRANG CHỦ
+        </a>
+    </div>
+</div>

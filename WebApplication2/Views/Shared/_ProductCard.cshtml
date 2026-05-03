@@ -1,0 +1,69 @@
+﻿@model WebApplication2.Models.Book
+
+<div class="card h-100 shadow-sm border-0 product-hover" style="border-radius: 20px; overflow: hidden; border: 1px solid #eee !important;">
+    @* --- NHÃN SALE % --- *@
+    @if (Model.SalePrice > 0 && Model.Price > Model.SalePrice)
+    {
+        double discount = ((double)(Model.Price - Model.SalePrice) / (double)Model.Price) * 100;
+        <div class="position-absolute bg-danger text-white px-3 py-1 fw-bold"
+             style="top: 10px; left: 0; border-radius: 0 15px 15px 0; z-index: 5; font-size: 0.8rem;">
+            <i class="fa-solid fa-bolt"></i> SALE @Math.Round(discount)%
+        </div>
+    }
+
+    <div class="p-3 bg-white d-flex align-items-center justify-content-center" style="height: 180px;">
+        <img src="@Url.Content(!string.IsNullOrEmpty(Model.ImagePath) ? Model.ImagePath : "~/Content/Images/no-image.jpg")"
+             class="card-img-top h-100 w-100" style="object-fit: contain;" alt="@Model.Title">
+    </div>
+
+    <div class="card-body text-center d-flex flex-column pt-0">
+        <h6 class="fw-bold text-dark text-truncate" title="@Model.Title">@Model.Title</h6>
+
+        <div class="flex-grow-1 mb-3">
+            @if (Model.SalePrice > 0)
+            {
+                <span class="text-danger fw-bold fs-5">@Model.SalePrice.Value.ToString("N0") đ</span>
+                <br />
+                <small class="text-muted text-decoration-line-through">@Model.Price.ToString("N0") đ</small>
+            }
+            else
+            {
+                <span class="text-dark fw-bold fs-5">@Model.Price.ToString("N0") đ</span>
+            }
+        </div>
+
+        <div class="d-grid gap-2 mt-auto">
+            @* MUA NGAY: Nhảy vào trang Cart *@
+            <a href="@Url.Action("AddToCart", "Cart", new { id = Model.Id })"
+               class="btn text-white fw-bold py-2 shadow-sm buy-button"
+               style="border-radius: 10px; background-color: #ff8c00; border: none;">
+                MUA NGAY
+            </a>
+
+            @* THÊM VÀO GIỎ: Dùng Ajax đã viết ở Home/Index *@
+            <button onclick="addToCart(@Model.Id)"
+                    class="btn btn-outline-warning fw-bold py-2 shadow-sm"
+                    style="border-radius: 10px; border: 1px solid #ff8c00; color: #ff8c00;">
+                <i class="fa-solid fa-cart-plus me-1"></i> THÊM VÀO GIỎ HÀNG
+            </button>
+
+            <a href="@Url.Action("Details", "Store", new { id = Model.Id })"
+               class="btn btn-link btn-sm text-muted text-decoration-none">Xem chi tiết</a>
+        </div>
+    </div>
+</div>
+<style>
+    .product-hover {
+        transition: all 0.3s ease-in-out;
+    }
+
+        .product-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 20px rgba(0,0,0,0.15) !important;
+        }
+
+    .buy-button:hover {
+        background-color: #e67e00 !important;
+        filter: brightness(1.1);
+    }
+</style>

@@ -1,0 +1,41 @@
+﻿@model WebApplication2.Models.RegisterViewModel
+@{ ViewBag.Title = "Đăng ký thành viên"; }
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card shadow-lg border-0" style="border-radius: 25px;">
+                <div class="card-header text-center py-4" style="background-color: #333; color: #ff8c00;">
+                    <h3 class="fw-bold mb-0"><i class="fa-solid fa-user-plus"></i> TẠO TÀI KHOẢN</h3>
+                </div>
+                <div class="card-body p-4">
+                    @using (Html.BeginForm("Register", "Account", FormMethod.Post, new { role = "form" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.ValidationSummary("", new { @class = "text-danger small" })
+
+                        <div class="mb-3">
+                            <label class="fw-bold text-muted small">EMAIL CỦA BẠN</label>
+                            @Html.TextBoxFor(m => m.Email, new { @class = "form-control shadow-sm", style = "border-radius: 10px;" })
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="fw-bold text-muted small">MẬT KHẨU</label>
+                            @Html.PasswordFor(m => m.Password, new { @class = "form-control shadow-sm", style = "border-radius: 10px;" })
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="fw-bold text-muted small">XÁC NHẬN MẬT KHẨU</label>
+                            @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control shadow-sm", style = "border-radius: 10px;" })
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-lg text-white" style="background-color: #ff8c00; border-radius: 12px; font-weight: bold;">ĐĂNG KÝ NGAY</button>
+                        </div>
+                        <p class="text-center mt-3 small">Đã có tài khoản? @Html.ActionLink("Đăng nhập", "Login")</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

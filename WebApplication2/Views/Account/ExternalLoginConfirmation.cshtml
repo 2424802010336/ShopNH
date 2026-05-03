@@ -1,0 +1,41 @@
+﻿@model WebApplication2.Models.ExternalLoginConfirmationViewModel
+@{ ViewBag.Title = "Hoàn tất đăng ký"; }
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow border-0" style="border-radius: 20px;">
+                <div class="card-header text-white text-center py-3" style="background-color: #333; border-radius: 20px 20px 0 0;">
+                    <h4 class="mb-0 fw-bold" style="color: #ff8c00;">LIÊN KẾT TÀI KHOẢN</h4>
+                </div>
+                <div class="card-body p-4">
+                    <p class="text-info text-center small mb-4">
+                        <i class="fa-solid fa-info-circle"></i> Bạn đã xác thực thành công qua <strong>@ViewBag.LoginProvider</strong>.
+                        Vui lòng nhập Email bên dưới để hoàn tất việc tạo tài khoản trên <strong>Sport Gear</strong>.
+                    </p>
+
+                    @using (Html.BeginForm("ExternalLoginConfirmation", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger small" })
+
+                        <div class="mb-4">
+                            <label class="fw-bold text-muted small">ĐỊA CHỈ EMAIL</label>
+                            @Html.TextBoxFor(m => m.Email, new { @class = "form-control shadow-sm", style = "border-radius: 10px; padding: 12px;" })
+                            @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-lg text-white"
+                                    style="background-color: #ff8c00; border-radius: 12px; font-weight: bold;">
+                                HOÀN TẤT ĐĂNG KÝ
+                            </button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts { @Scripts.Render("~/bundles/jqueryval") }

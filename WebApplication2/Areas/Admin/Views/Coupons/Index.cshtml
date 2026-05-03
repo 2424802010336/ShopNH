@@ -1,0 +1,61 @@
+﻿@model IEnumerable<WebApplication2.Models.Coupon>
+@{
+    ViewBag.Title = "Quản lý Voucher";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold m-0 text-dark"><i class="fa-solid fa-ticket-simple me-2 text-primary"></i>QUẢN LÝ VOUCHER</h2>
+    <div>
+        <a href="@Url.Action("ApplySale")" class="btn btn-warning rounded-pill px-4 shadow-sm me-2 fw-bold text-dark">
+            <i class="fa-solid fa-tag me-2"></i>Áp dụng Sale
+        </a>
+        <a href="@Url.Action("Create")" class="btn btn-primary rounded-pill px-4 shadow-sm fw-bold">
+            <i class="fa-solid fa-plus me-2"></i>Tạo mã mới
+        </a>
+    </div>
+</div>
+
+<div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+    <div class="card-body p-0 bg-white">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-dark text-white">
+                    <tr>
+                        <th class="ps-4 py-3" style="width: 25%">Mã Voucher</th>
+                        <th style="width: 20%">Giảm (%)</th>
+                        <th style="width: 30%">Ngày hết hạn</th>
+                        <th class="text-center" style="width: 25%">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody class="text-dark">
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="ps-4">
+                                <span class="fw-bold text-primary fs-5">@item.Code</span>
+                            </td>
+                            <td>
+                                <span class="badge bg-danger rounded-pill px-3">Giảm @item.DiscountPercent%</span>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center text-muted">
+                                    <i class="fa-regular fa-calendar-days me-2"></i>
+                                    @item.ExpiryDate.ToString("dd/MM/yyyy")
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <a href="@Url.Action("Edit", new { id = item.Id })" class="btn btn-sm btn-outline-primary border-0 rounded-circle me-1" title="Sửa">
+                                    <i class="fa-solid fa-pen-to-square fs-5"></i>
+                                </a>
+                                <a href="@Url.Action("Delete", new { id = item.Id })" class="btn btn-sm btn-outline-danger border-0 rounded-circle" title="Xóa" onclick="return confirm('Bạn có chắc muốn xóa mã này?')">
+                                    <i class="fa-solid fa-trash-can fs-5"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

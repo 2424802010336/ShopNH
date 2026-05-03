@@ -1,0 +1,16 @@
+﻿@using WebApplication2.Models
+@{
+    // Không cần đặt tiêu đề ViewBag ở đây vì đây là Partial View
+}
+
+<ul class="navbar-nav ms-auto align-items-center">
+    <li class="nav-item">
+        <a class="nav-link position-relative d-inline-block py-2 px-3" href="@Url.Action("Index", "Cart")">
+            <i class="fa-solid fa-cart-shopping text-white fa-lg"></i>
+            <span class="position-absolute badge rounded-pill bg-danger cart-count-badge"
+                  style="top: 2px; right: 2px; font-size: 0.65rem; padding: 0.35em 0.5em;">
+                @((Session["Cart"] as List<WebApplication2.Models.CartItem>)?.Sum(x => x.Quantity) ?? 0)
+            </span>
+        </a>
+    </li>
+</ul>

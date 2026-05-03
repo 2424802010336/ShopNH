@@ -1,0 +1,34 @@
+﻿@{ ViewBag.Title = "Thông tin giao hàng"; }
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg border-0 p-4" style="border-radius: 25px;">
+                <h3 class="text-center fw-bold mb-4" style="color: #ff8c00;">🚚 THÔNG TIN GIAO HÀNG</h3>
+
+                @using (Html.BeginForm("ProcessOrder", "Cart", FormMethod.Post))
+                {
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Họ và tên người nhận</label>
+                        <input type="text" name="CustomerName" class="form-control py-2" placeholder="Ví dụ: Nguyễn Văn A" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Số điện thoại</label>
+                        <input type="tel" name="Phone" class="form-control py-2" placeholder="09xxxxxxxx" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Địa chỉ giao hàng (Bình Dương/TP.HCM...)</label>
+                        <textarea name="Address" class="form-control" rows="3" placeholder="Số nhà, tên đường, phường..." required></textarea>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Ghi chú thêm</label>
+                        <input type="text" name="Note" class="form-control" placeholder="Giao giờ hành chính, gọi trước khi đến...">
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-warning btn-lg text-white fw-bold py-3 shadow" style="border-radius: 15px;">XÁC NHẬN ĐẶT HÀNG</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,36 @@
+﻿@model WebApplication2.Models.VerifyPhoneNumberViewModel
+@{
+    ViewBag.Title = "Xác nhận số điện thoại";
+}
+
+<div class="container mt-5">
+    <div class="card shadow border-0 mx-auto" style="max-width: 450px; border-radius: 20px;">
+        <div class="card-body p-5 text-center">
+            <div class="mb-4">
+                <i class="fa-solid fa-shield-check fa-4x" style="color: #ff8c00;"></i>
+            </div>
+            <h3 class="fw-bold mb-3">XÁC NHẬN MÃ OTP</h3>
+            <p class="text-muted small">Vui lòng nhập mã xác minh đã được gửi đến số điện thoại: <br /><strong>@Model.PhoneNumber</strong></p>
+            <hr />
+
+            @using (Html.BeginForm("VerifyPhoneNumber", "Manage", FormMethod.Post, new { role = "form" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.Hidden("phoneNumber", @Model.PhoneNumber)
+                @Html.ValidationSummary("", new { @class = "text-danger small mb-3" })
+
+                <div class="mb-4">
+                    <label class="fw-bold small text-muted mb-2">NHẬP MÃ CODE</label>
+                    @Html.TextBoxFor(m => m.Code, new { @class = "form-control text-center fs-4 fw-bold", placeholder = "000000", style = "border-radius: 12px; border: 2px solid #ff8c00; letter-spacing: 5px;" })
+                </div>
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-lg text-white shadow-sm" style="background-color: #ff8c00; border-radius: 12px; font-weight: bold;">
+                        XÁC NHẬN NGAY
+                    </button>
+                    <a href="@Url.Action("Index")" class="btn btn-link text-muted mt-2">Hủy bỏ</a>
+                </div>
+            }
+        </div>
+    </div>
+</div>

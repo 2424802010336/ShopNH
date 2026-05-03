@@ -1,0 +1,174 @@
+﻿@using PagedList.Mvc;
+@model PagedList.IPagedList<WebApplication2.Models.Book>
+@{
+    ViewBag.Title = "Quản lý kho hàng - Admin";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 bg-white p-3 shadow-sm rounded-4">
+        <h3 class="fw-bold text-dark m-0">
+            <i class="fa-solid fa-gear text-warning"></i> QUẢN TRỊ SẢN PHẨM
+        </h3>
+
+        @using (Html.BeginForm("Index", "Books", new { area = "Admin" }, FormMethod.Get, new { @class = "d-flex align-items-center w-75" }))
+        {
+            <div class="input-group me-2">
+                <select name="category" class="form-select rounded-pill-start border-secondary shadow-none" style="max-width: 250px; font-weight: 500;">
+                    <option value="">-- Tất cả sản phẩm --</option>
+
+                    <optgroup label="🏸 VỢT CẦU LÔNG">
+                        <option value="Vot" @(Request.QueryString["category"] == "Vot" ? "selected" : "") style="font-weight: bold;">VỢT CẦU LÔNG (TẤT CẢ)</option>
+                        <option value="VotYonex" @(Request.QueryString["category"] == "VotYonex" ? "selected" : "")>Vợt Yonex</option>
+                        <option value="VotLining" @(Request.QueryString["category"] == "VotLining" ? "selected" : "")>Vợt Lining</option>
+                        <option value="VotVS" @(Request.QueryString["category"] == "VotVS" ? "selected" : "")>Vợt VS</option>
+                        <option value="VotVictor" @(Request.QueryString["category"] == "VotVictor" ? "selected" : "")>Vợt Victor</option>
+                        <option value="VotMizuno" @(Request.QueryString["category"] == "VotMizuno" ? "selected" : "")>Vợt Mizuno</option>
+                    </optgroup>
+
+                    <optgroup label="👟 GIÀY CẦU LÔNG">
+                        <option value="Giay" @(Request.QueryString["category"] == "Giay" ? "selected" : "") style="font-weight: bold;">GIÀY CẦU LÔNG (TẤT CẢ)</option>
+                        <option value="GiayYonex" @(Request.QueryString["category"] == "GiayYonex" ? "selected" : "")>Giày Yonex</option>
+                        <option value="GiayLining" @(Request.QueryString["category"] == "GiayLining" ? "selected" : "")>Giày Lining</option>
+                        <option value="GiayVS" @(Request.QueryString["category"] == "GiayVS" ? "selected" : "")>Giày VS</option>
+                        <option value="GiayVictor" @(Request.QueryString["category"] == "GiayVictor" ? "selected" : "")>Giày Victor</option>
+                        <option value="GiayMizuno" @(Request.QueryString["category"] == "GiayMizuno" ? "selected" : "")>Giày Mizuno</option>
+                    </optgroup>
+
+                    <optgroup label="👕 ÁO CẦU LÔNG">
+                        <option value="Ao" @(Request.QueryString["category"] == "Ao" ? "selected" : "") style="font-weight: bold;">TẤT CẢ ÁO</option>
+                        <option value="AoYonex">Áo Yonex</option>
+                        <option value="AoLining">Áo Lining</option>
+                        <option value="AoVS">Áo VS</option>
+                        <option value="AoVictor">Áo Victor</option>
+                        <option value="AoMizuno">Áo Mizuno</option>
+                    </optgroup>
+
+                    <optgroup label="👗 VÁY CẦU LÔNG">
+                        <option value="Vay" @(Request.QueryString["category"] == "Vay" ? "selected" : "") style="font-weight: bold;">TẤT CẢ VÁY</option>
+                        <option value="VayYonex">Váy Yonex</option>
+                        <option value="VayLining">Váy Lining</option>
+                        <option value="VayVS">Váy VS</option>
+                        <option value="VayVictor">Váy Victor</option>
+                        <option value="VayMizuno">Váy Mizuno</option>
+                    </optgroup>
+
+                    <optgroup label="🩳 QUẦN CẦU LÔNG">
+                        <option value="Quan" @(Request.QueryString["category"] == "Quan" ? "selected" : "") style="font-weight: bold;">TẤT CẢ QUẦN</option>
+                        <option value="QuanYonex">Quần Yonex</option>
+                        <option value="QuanLining">Quần Lining</option>
+                        <option value="QuanVS">Quần VS</option>
+                        <option value="QuanVictor">Quần Victor</option>
+                        <option value="QuanMizuno">Quần Mizuno</option>
+                    </optgroup>
+
+                    <optgroup label="👜 TÚI VỢT">
+                        <option value="TuiVot" @(Request.QueryString["category"] == "TuiVot" ? "selected" : "") style="font-weight: bold;">TẤT CẢ TÚI</option>
+                        <option value="TuiYonex">Túi Yonex</option>
+                        <option value="TuiLining">Túi Lining</option>
+                        <option value="TuiVS">Túi VS</option>
+                    </optgroup>
+
+                    <optgroup label="🎒 BALO">
+                        <option value="Balo" @(Request.QueryString["category"] == "Balo" ? "selected" : "") style="font-weight: bold;">TẤT CẢ BALO</option>
+                        <option value="BaloYonex">Balo Yonex</option>
+                        <option value="BaloLining">Balo Lining</option>
+                        <option value="BaloVictor">Balo Victor</option>
+                    </optgroup>
+
+                    <optgroup label="⚙️ PHỤ KIỆN">
+                        <option value="PhuKien" @(Request.QueryString["category"] == "PhuKien" ? "selected" : "")>Tất cả Phụ kiện</option>
+                        <option value="Vo">Vớ cầu lông</option>
+                        <option value="QuanCan">Quấn cán vợt</option>
+                        <option value="QuaCau">Quả cầu lông</option>
+                        <option value="Cuoc">Cước căng vợt</option>
+                        <option value="ChanMoHoi">Băng chặn mồ hôi</option>
+                        <option value="NuocRuaGiay">Nước rửa giày</option>
+                    </optgroup>
+                </select>
+
+                <input type="text" name="searchString" value="@Request.QueryString["searchString"]" class="form-control ps-3 border-secondary border-start-0" placeholder="Tìm tên sản phẩm...">
+                <button type="submit" class="btn btn-dark rounded-pill-end px-4"><i class="fa-solid fa-magnifying-glass"></i></button>
+            </div>
+        }
+
+        <a href="@Url.Action("Create", "Books", new { area = "Admin" })" class="btn btn-warning text-white fw-bold rounded-pill px-4 shadow-sm">
+            <i class="fa-solid fa-plus"></i> THÊM MỚI
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-dark text-white">
+                    <tr>
+                        <th class="ps-4 py-3">Sản phẩm</th>
+                        <th>Ảnh</th>
+                        <th>Danh mục</th>
+                        <th>Giá bán</th>
+                        <th class="text-center">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model == null || !Model.Any())
+                    {
+                        <tr><td colspan="5" class="text-center py-5 text-muted">Không tìm thấy sản phẩm phù hợp.</td></tr>
+                    }
+                    else
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="ps-4 fw-bold text-primary">@item.Title</td>
+                                <td><img src="@Url.Content(string.IsNullOrEmpty(item.ImagePath) ? "~/Content/Images/no-image.png" : item.ImagePath)" style="width:50px; height:50px; object-fit:contain;" class="rounded border shadow-sm"></td>
+                                <td><span class="badge rounded-pill bg-light text-dark border px-3">@item.Category</span></td>
+                                <td><span class="text-danger fw-bold">@item.Price.ToString("N0") đ</span></td>
+                                <td class="text-center">
+                                    <div class="btn-group shadow-sm border rounded-3">
+                                        <a href="@Url.Action("Edit", "Books", new { area = "Admin", id = item.Id })" class="btn btn-sm btn-white text-primary border-end"><i class="fa-solid fa-pen"></i></a>
+                                        <a href="@Url.Action("Details", "Books", new { area = "Admin", id = item.Id })" class="btn btn-sm btn-white text-info border-end"><i class="fa-solid fa-eye"></i></a>
+                                        <a href="@Url.Action("Delete", "Books", new { area = "Admin", id = item.Id })" class="btn btn-sm btn-white text-danger"><i class="fa-solid fa-trash"></i></a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-center mt-4">
+        @Html.PagedListPager(Model, page => Url.Action("Index", new { page, searchString = Request.QueryString["searchString"], category = Request.QueryString["category"] }), new PagedListRenderOptions { LiElementClasses = new string[] { "page-item" }, UlElementClasses = new string[] { "pagination pagination-sm" } })
+    </div>
+</div>
+
+<style>
+    .rounded-pill-start {
+        border-top-left-radius: 50rem !important;
+        border-bottom-left-radius: 50rem !important;
+    }
+
+    .rounded-pill-end {
+        border-top-right-radius: 50rem !important;
+        border-bottom-right-radius: 50rem !important;
+    }
+
+    .pagination .active .page-link {
+        background-color: #212529 !important;
+        border-color: #212529 !important;
+        color: white !important;
+    }
+
+    .pagination .page-link {
+        color: #212529;
+    }
+
+    .btn-white {
+        background: white;
+    }
+
+        .btn-white:hover {
+            background: #f8f9fa;
+        }
+</style>

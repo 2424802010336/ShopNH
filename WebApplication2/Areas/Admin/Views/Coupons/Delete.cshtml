@@ -1,0 +1,50 @@
+﻿@model WebApplication2.Models.Coupon
+@{
+    ViewBag.Title = "Xóa Voucher";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card border-0 shadow-lg rounded-5 overflow-hidden">
+                <div class="card-body p-5 text-center bg-white">
+                    <!-- Icon cảnh báo -->
+                    <div class="mb-4">
+                        <i class="fa-solid fa-circle-exclamation text-danger" style="font-size: 80px;"></i>
+                    </div>
+
+                    <h3 class="fw-bold text-dark mb-3">Xác nhận xóa?</h3>
+                    <p class="text-muted mb-4">
+                        Bạn có chắc chắn muốn xóa mã giảm giá <span class="fw-bold text-danger">@Model.Code</span> không?
+                        <br><small class="text-secondary">(Hành động này không thể hoàn tác)</small>
+                    </p>
+
+                    <div class="row g-3">
+                        <div class="col-12">
+                            @using (Html.BeginForm())
+                            {
+                                @Html.AntiForgeryToken()
+                                @Html.HiddenFor(m => m.Id)
+                                <button type="submit" class="btn btn-danger btn-lg w-100 rounded-pill fw-bold shadow-sm">
+                                    <i class="fa-solid fa-trash-can me-2"></i>ĐỒNG Ý XÓA
+                                </button>
+                            }
+                        </div>
+                        <div class="col-12">
+                            <a href="@Url.Action("Index")" class="btn btn-light btn-lg w-100 rounded-pill fw-bold text-muted">
+                                Quay lại
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bảng tóm tắt thông tin dưới Card -->
+                <div class="bg-light p-3 border-top text-center">
+                    <span class="badge bg-info text-dark">Giảm @Model.DiscountPercent%</span>
+                    <span class="badge bg-secondary ms-2">Hết hạn: @Model.ExpiryDate.ToString("dd/MM/yyyy")</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

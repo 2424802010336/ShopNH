@@ -1,0 +1,59 @@
+﻿@model WebApplication2.Models.Book
+@{ ViewBag.Title = "Chi tiết sản phẩm"; }
+
+<div class="container py-4">
+    <div class="card shadow-lg border-0" style="border-radius: 25px; overflow: hidden;">
+        <div class="row g-0">
+            <div class="col-md-5 bg-light d-flex align-items-center justify-content-center p-3">
+                <img src="@Url.Content(Model.ImagePath)" class="img-fluid rounded-4 shadow" style="max-height: 500px; object-fit: contain;" onerror="this.src='/Content/Images/no-image.png'">
+            </div>
+            <div class="col-md-7">
+                <div class="card-body p-5">
+                    <span class="badge bg-warning text-dark mb-2 px-3 py-2">@Model.Category</span>
+                    <h1 class="fw-bold text-dark mb-3">@Model.Title</h1>
+                    <hr>
+
+                    <div class="my-4">
+                        @if (Model.SalePrice.HasValue && Model.SalePrice < Model.Price)
+                        {
+                            <h4 class="text-muted"><del>@String.Format("{0:0,0}", Model.Price) đ</del></h4>
+                            <h2 class="text-danger fw-bold">Giá bán: @String.Format("{0:0,0}", Model.SalePrice) đ</h2>
+                        }
+                        else
+                        {
+                            <h2 class="text-danger fw-bold">Giá bán: @String.Format("{0:0,0}", Model.Price) đ</h2>
+                        }
+                    </div>
+
+                    @* HIỂN THỊ THÔNG SỐ KỸ THUẬT THEO LOẠI *@
+                    <div class="p-4 bg-light rounded-4 mb-4 border">
+                        <h6 class="fw-bold mb-3"><i class="fa-solid fa-gear me-2"></i>THÔNG SỐ CHI TIẾT</h6>
+                        <div class="row">
+                            @if (Model.Category != null && Model.Category.Contains("Vot"))
+                            {
+                                <div class="col-md-4 mb-2 border-end"><strong>Trọng lượng:</strong> <br /> @(Model.Weight ?? "N/A")</div>
+                                <div class="col-md-4 mb-2 border-end"><strong>Swingweight:</strong> <br /> @(Model.SwingWeight ?? "N/A")</div>
+                                <div class="col-md-4 mb-2"><strong>Chiều dài cán:</strong> <br /> @(Model.HandleLength ?? "N/A")</div>
+                            }
+                            @if (Model.Category != null && (Model.Category.Contains("Giay") || Model.Category.Contains("Ao") || Model.Category.Contains("Quan") || Model.Category.Contains("Vay")))
+                            {
+                                <div class="col-md-6 mb-2 border-end"><strong>Size sẵn có:</strong> <br /> @(Model.SizeList ?? "N/A")</div>
+                                if (Model.Category.Contains("Giay"))
+                                {
+                                    <div class="col-md-6 mb-2"><strong>Form chân:</strong> <br /> @(Model.FormType ?? "N/A")</div>
+                                }
+                            }
+                        </div>
+                    </div>
+
+                    <p class="text-secondary"><strong>Mô tả bài viết:</strong> <br /> @Model.Description</p>
+
+                    <div class="mt-5 pt-3 border-top text-end">
+                        <a href="@Url.Action("Edit", new { id = Model.Id })" class="btn btn-warning text-white fw-bold px-5 rounded-pill shadow-sm">CHỈNH SỬA</a>
+                        <a href="@Url.Action("Index")" class="btn btn-outline-secondary px-4 ms-2 rounded-pill">QUAY LẠI</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

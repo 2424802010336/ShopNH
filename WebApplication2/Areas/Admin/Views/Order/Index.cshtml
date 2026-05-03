@@ -1,0 +1,53 @@
+﻿@model IEnumerable<WebApplication2.Models.Order>
+@{
+    ViewBag.Title = "Quản lý đơn hàng";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4 p-4 rounded-4 shadow-sm" style="background: #1e293b; border-left: 6px solid #38bdf8;">
+        <h3 class="fw-bold text-white m-0">
+            <i class="fa-solid fa-shopping-bag text-info me-2"></i> QUẢN LÝ ĐƠN HÀNG
+        </h3>
+        <span class="badge bg-info text-dark px-4 py-2 rounded-pill">Tổng số: @Model.Count() đơn</span>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead style="background: #f1f5f9;">
+                    <tr>
+                        <th class="ps-4">Mã ĐH</th>
+                        <th>Khách hàng</th>
+                        <th>Ngày đặt</th>
+                        <th>Tổng tiền</th>
+                        <th class="text-center">Trạng thái</th>
+                        <th class="text-center">Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="ps-4 fw-bold text-secondary">#@item.Id</td>
+                            <td><div class="fw-bold">@item.CustomerName</div></td>
+                            <td>@item.OrderDate.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td><span class="text-danger fw-bold">@String.Format("{0:0,0}", item.TotalAmount) đ</span></td>
+                            <td class="text-center">
+                                @if (item.Status == "Hoàn thành")
+                                {<span class="badge bg-success">Đã giao</span> }
+                                else
+                                { <span class="badge bg-warning text-dark">Chờ duyệt</span>}
+                            </td>
+                            <td class="text-center">
+                                <a href="@Url.Action("Details", "Order", new { area = "Admin", id = item.Id })" class="btn btn-sm btn-info text-white rounded-pill px-3">
+                                    <i class="fa-solid fa-eye me-1"></i>Chi tiết
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

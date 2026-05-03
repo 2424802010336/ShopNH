@@ -1,0 +1,73 @@
+﻿@model WebApplication2.Models.News
+
+@{
+    ViewBag.Title = "Chi tiết tin tức";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+    @* --- Header --- *@
+    <div class="card-header bg-dark py-3 d-flex justify-content-between align-items-center">
+        <h4 class="fw-bold m-0 text-white">
+            <i class="fa-solid fa-circle-info me-2 text-info"></i>CHI TIẾT TIN TỨC
+        </h4>
+        <a href="@Url.Action("Index")" class="btn btn-outline-light rounded-pill px-4 btn-sm">
+            <i class="fa-solid fa-arrow-left me-2"></i>Quay lại danh sách
+        </a>
+    </div>
+
+    @* --- Body --- *@
+    <div class="card-body p-4">
+        <div class="row">
+            @* Cột hiển thị ảnh bài viết *@
+            <div class="col-md-5 mb-4">
+                <div class="rounded-4 overflow-hidden border shadow-sm bg-light d-flex align-items-center justify-content-center" style="min-height: 300px;">
+                    @* CHỐNG LỖI: Kiểm tra null trước khi gọi Url.Content *@
+                    @if (Model != null && !string.IsNullOrEmpty(Model.ImagePath))
+                    {
+                        <img src="@Url.Content(Model.ImagePath)" class="img-fluid w-100" style="object-fit: cover;" alt="@Model.Title">
+                    }
+                    else
+                    {
+                        <div class="text-center p-5 text-muted">
+                            <i class="fa-solid fa-image fa-4x mb-3 opacity-25"></i>
+                            <p class="small m-0">Bài viết này chưa có ảnh minh họa</p>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            @* Cột nội dung chi tiết *@
+            <div class="col-md-7">
+                <div class="ps-md-3">
+                    <h2 class="fw-bold text-dark mb-3">@Model.Title</h2>
+
+                    <div class="d-flex align-items-center mb-4 text-muted small">
+                        <span class="me-3"><i class="fa-regular fa-calendar-days me-2 text-primary"></i>Ngày đăng: @Model.CreatedDate.ToString("dd/MM/yyyy HH:mm")</span>
+                        <span><i class="fa-solid fa-hashtag me-2 text-primary"></i>ID: #@Model.Id</span>
+                    </div>
+
+                    <div class="p-3 bg-light rounded-3 mb-4 border-start border-primary border-4">
+                        <h6 class="fw-bold text-dark mb-2">Mô tả ngắn:</h6>
+                        <p class="text-secondary m-0">@Model.ShortDescription</p>
+                    </div>
+
+                    <h6 class="fw-bold text-dark mb-3">Nội dung chi tiết:</h6>
+                    <div class="text-dark lh-base mb-5" style="white-space: pre-line;">
+                        @Model.Content
+                    </div>
+
+                    <hr>
+                    <div class="d-flex gap-2">
+                        <a href="@Url.Action("Edit", new { id = Model.Id })" class="btn btn-warning px-4 rounded-pill fw-bold shadow-sm">
+                            <i class="fa-solid fa-pen-to-square me-2"></i>Chỉnh sửa bài viết
+                        </a>
+                        <a href="@Url.Action("Delete", new { id = Model.Id })" class="btn btn-outline-danger px-4 rounded-pill fw-bold">
+                            <i class="fa-solid fa-trash-can me-2"></i>Xóa tin này
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

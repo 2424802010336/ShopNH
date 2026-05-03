@@ -1,0 +1,453 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - SHOP NH</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            background-color: #f4f7f6;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* NAVBAR */
+        .navbar-custom {
+            background-color: #ff8c00 !important;
+            border: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 5px 0;
+        }
+
+            .navbar-custom .navbar-brand {
+                color: #fff !important;
+                font-weight: bold;
+                font-size: 1.5rem;
+            }
+
+            .navbar-custom .nav-link {
+                color: #fff !important;
+                font-size: 1rem;
+                transition: 0.3s;
+                padding: 10px 15px !important;
+                font-weight: 500;
+            }
+
+
+        /* --- MEGA MENU CẦU LÔNG --- */
+
+        .mega-menu {
+            position: static !important;
+        }
+
+        .mega-menu-content {
+            width: 95vw;
+            max-width: 1200px;
+            left: 50% !important;
+            transform: translateX(-50%) translateY(20px) !important;
+            border-radius: 15px !important;
+            border: none !important;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15) !important;
+            visibility: hidden;
+            opacity: 0;
+            display: block;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            background: white;
+            position: absolute;
+        }
+
+        .mega-menu:hover .mega-menu-content {
+            visibility: visible;
+            opacity: 1;
+            transform: translateX(-50%) translateY(0) !important;
+        }
+
+        .mega-list-title {
+            color: #ff8c00;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+        }
+
+        .mega-list {
+            list-style: none;
+            padding: 0;
+        }
+
+            .mega-list li a {
+                color: #444;
+                text-decoration: none;
+                font-size: 0.9rem;
+                display: block;
+                padding: 5px 0;
+                transition: 0.2s;
+            }
+
+                .mega-list li a:hover {
+                    color: #ff8c00;
+                    padding-left: 5px;
+                }
+
+        /* --- STYLE ACCOUNT & GIỎ HÀNG --- */
+        .mini-cart-box {
+            position: absolute;
+            right: 0;
+            top: 100%;
+            width: 280px !important;
+            padding-top: 10px;
+            z-index: 9999 !important;
+            visibility: hidden;
+            opacity: 0;
+            transform: translateY(15px);
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+
+        .account-dropdown:hover .account-menu-box,
+        .cart-dropdown:hover .mini-cart-box {
+            visibility: visible;
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .account-menu-box {
+            position: absolute;
+            right: 0;
+            top: 100%;
+            width: 280px !important; /* Rộng hơn để chứa email dài */
+            padding-top: 15px; /* Khoảng cách đệm để di chuột mượt */
+            z-index: 9999 !important;
+            visibility: hidden;
+            opacity: 0;
+            transform: translateY(15px);
+            transition: all 0.3s ease;
+        }
+
+        .account-content-inner {
+            background-color: #ffffff !important;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.25) !important; /* Đổ bóng đậm cho nổi bật */
+            overflow: hidden;
+            border: 1px solid #eee;
+        }
+
+        /* Header của menu Account (Chỗ Xin chào) */
+        .account-header {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .account-item {
+            padding: 12px 20px !important;
+            display: flex !important;
+            align-items: center;
+            color: #333 !important;
+            text-decoration: none !important;
+            transition: all 0.2s ease;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            border-bottom: 1px solid #f1f1f1;
+        }
+
+            .account-item i {
+                width: 25px;
+                font-size: 1.1rem;
+                color: #ff8c00;
+                margin-right: 10px;
+            }
+
+            .account-item:hover {
+                background-color: #fff4e6 !important;
+                color: #ff8c00 !important;
+                padding-left: 25px; /* Hiệu ứng nhích nhẹ sang phải */
+            }
+
+        /* MAIN CONTENT BOX (Khung trắng body) */
+        .main-content-box {
+            background-color: #ffffff;
+            border-radius: 30px;
+            padding: 30px;
+            margin-top: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            min-height: 600px;
+            position: relative;
+            z-index: 1; /* Để nằm dưới menu dropdown */
+        }
+
+        /*FOOTER*/
+        .map-container {
+            width: 100%;
+            height: 300px;
+            overflow: hidden;
+            border-bottom: 2px solid #eee;
+        }
+
+            .map-container iframe {
+                filter: grayscale(10%) contrast(1.1); /* Giúp map trông nghệ thuật hơn, tiệp màu web */
+                transition: 0.5s;
+            }
+
+            .map-container:hover iframe {
+                filter: grayscale(0%); /* Khi di chuột vào map sẽ hiện màu rõ nét */
+            }
+
+        .footer-custom hr {
+            border-top: 1px solid #eee;
+            width: 50%;
+            margin: 20px auto;
+        }
+
+        .btn-admin-nav {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            margin-left: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-custom">
+        <div class="container">
+            <a href="@Url.Action("Index", "Home")" class="navbar-brand">🏆 SHOP NH</a>
+            <div class="collapse navbar-collapse d-sm-inline-flex justify-content-between">
+                <ul class="navbar-nav flex-grow-1">
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("Index", "Home")"><i class="fa-solid fa-house"></i> Trang chủ</a></li>
+                    <li class="nav-item dropdown mega-menu">
+                        <a class="nav-link dropdown-toggle" href="#" id="megaMenuLink">
+                            <i class="fa-solid fa-store"></i> Sản phẩm
+                        </a>
+                        <div class="dropdown-menu mega-menu-content p-4">
+                            <!-- HÀNG 1 -->
+                            <div class="row">
+                                <!-- VỢT CẦU LÔNG -->
+                                <div class="col">
+                                    <div class="mega-list-title"><a href="@Url.Action("Category", "Store", new { group = "Vot" })">🏸 VỢT CẦU LÔNG</a></div>
+                                    <ul class="mega-list">
+                                        <li><a href="@Url.Action("Category", "Store", new { brand = "VotYonex" })">Vợt Yonex</a></li>
+                                        <li><a href="@Url.Action("Category", "Store", new { brand = "VotLining" })">Vợt Lining</a></li>
+                                        <li><a href="@Url.Action("Category", "Store", new { brand = "VotVS" })">Vợt VS</a></li>
+                                        <li><a href="@Url.Action("Category", "Store", new { brand = "VotVictor" })">Vợt Victor</a></li>
+                                        <li><a href="@Url.Action("Category", "Store", new { brand = "VotMizuno" })">Vợt Mizuno</a></li>
+                                    </ul>
+                                </div>
+                                <!-- GIÀY CẦU LÔNG -->
+                                <div class="col">
+                                    <div class="mega-list-title"><a href="@Url.Action("Category", "Store", new { group = "Giay" })">👟 GIÀY CẦU LÔNG</a></div>
+                                    <ul class="mega-list">
+                                        <li><a href="@Url.Action("Category", "Store", new { brand = "GiayYonex" })">Giày Yonex</a></li>
+                                        <li><a href="@Url.Action("Category", "Store", new { brand = "GiayLining" })">Giày Lining</a></li>
+                                        <li><a href="@Url.Action("Category", "Store", new { brand = "GiayVS" })">Giày VS</a></li>
+                                        <li><a href="@Url.Action("Category", "Store", new { brand = "GiayVictor" })">Giày Victor</a></li>
+                                        <li><a href="@Url.Action("Category", "Store", new { brand = "GiayMizuno" })">Giày Mizuno</a></li>
+                                    </ul>
+                                </div>
+                                <!-- ÁO CẦU LÔNG -->
+                                <div class="col">
+                                    <div class="mega-list-title"><a href="@Url.Action("Category", "Store", new { group = "Ao" })">👕 ÁO CẦU LÔNG</a></div>
+                                    <ul class="mega-list">
+                                        <li><a href="@Url.Action("Category", "Store", new { brand = "AoYonex" })">Áo Yonex</a></li>
+                                        <li><a href="@Url.Action("Category", "Store", new { brand = "AoLining" })">Áo Lining</a></li>
+                                        <li><a href="@Url.Action("Category", "Store", new { brand = "AoVS" })">Áo VS</a></li>
+                                        <li><a href="@Url.Action("Category", "Store", new { brand = "AoVictor" })">Áo Victor</a></li>
+                                        <li><a href="@Url.Action("Category", "Store", new { brand = "AoMizuno" })">Áo Mizuno</a></li>
+                                    </ul>
+                                </div>
+                                <!-- VÁY CẦU LÔNG -->
+                                <div class="col">
+                                    <div class="mega-list-title"><a href="@Url.Action("Category", "Store", new { group = "Vay" })">👗 VÁY CẦU LÔNG</a></div>
+                                    <ul class="mega-list">
+                                        <li><a href="@Url.Action("Category", "Store", new { brand = "VayYonex" })">Váy Yonex</a></li>
+                                        <li><a href="@Url.Action("Category", "Store", new { brand = "VayLining" })">Váy Lining</a></li>
+                                        <li><a href="@Url.Action("Category", "Store", new { brand = "VayVS" })">Váy VS</a></li>
+                                        <li><a href="@Url.Action("Category", "Store", new { brand = "VayVictor" })">Váy Victor</a></li>
+                                        <li><a href="@Url.Action("Category", "Store", new { brand = "VayMizuno" })">Váy Mizuno</a></li>
+                                    </ul>
+                                </div>
+                                <!-- QUẦN CẦU LÔNG -->
+                                <div class="col">
+                                    <div class="mega-list-title"><a href="@Url.Action("Category", "Store", new { group = "Quan" })">🩳 QUẦN CẦU LÔNG</a></div>
+                                    <ul class="mega-list">
+                                        <li><a href="@Url.Action("Category", "Store", new { brand = "QuanYonex" })">Quần Yonex</a></li>
+                                        <li><a href="@Url.Action("Category", "Store", new { brand = "QuanLining" })">Quần Lining</a></li>
+                                        <li><a href="@Url.Action("Category", "Store", new { brand = "QuanVS" })">Quần VS</a></li>
+                                        <li><a href="@Url.Action("Category", "Store", new { brand = "QuanVictor" })">Quần Victor</a></li>
+                                        <li><a href="@Url.Action("Category", "Store", new { brand = "QuanMizuno" })">Quần Mizuno</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- HÀNG 2 (Cách ra một chút) -->
+                            <div class="row mt-4">
+                                <!-- TÚI VỢT -->
+                                <div class="col-md-2">
+                                    <div class="mega-list-title"><a href="@Url.Action("Category", "Store", new { group = "TuiVot" })">👜 TÚI VỢT</a></div>
+                                    <ul class="mega-list">
+                                        <li><a href="@Url.Action("Category", "Store", new { brand = "TuiYonex" })">Túi Yonex</a></li>
+                                        <li><a href="@Url.Action("Category", "Store", new { brand = "TuiLining" })">Túi Lining</a></li>
+                                        <li><a href="@Url.Action("Category", "Store", new { brand = "TuiVS" })">Túi VS</a></li>
+                                    </ul>
+                                </div>
+                                <!-- BALO -->
+                                <div class="col-md-2">
+                                    <div class="mega-list-title"><a href="@Url.Action("Category", "Store", new { group = "Balo" })">🎒 BALO</a></div>
+                                    <ul class="mega-list">
+                                        <li><a href="@Url.Action("Category", "Store", new { brand = "BaloYonex" })">Balo Yonex</a></li>
+                                        <li><a href="@Url.Action("Category", "Store", new { brand = "BaloLining" })">Balo Lining</a></li>
+                                        <li><a href="@Url.Action("Category", "Store", new { brand = "BaloVictor" })">Balo Victor</a></li>
+                                    </ul>
+                                </div>
+                                <!-- PHỤ KIỆN -->
+                                <div class="col-md-8">
+                                    <div class="mega-list-title"><a href="@Url.Action("Category", "Store", new { group = "PhuKien" })">⚙️ PHỤ KIỆN CẦU LÔNG</a></div>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <ul class="mega-list">
+                                                <li><a href="#">Vớ cầu lông</a></li>
+                                                <li><a href="#">Quấn cán vợt</a></li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <ul class="mega-list">
+                                                <li><a href="#">Quả cầu lông</a></li>
+                                                <li><a href="#">Cước căng vợt</a></li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <ul class="mega-list">
+                                                <li><a href="#">Băng chặn mồ hôi</a></li>
+                                                <li><a href="#">Nước rửa giày</a></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("News", "Home")"><i class="fa-solid fa-newspaper"></i> Tin tức</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("Contact", "Home")"><i class="fa-solid fa-phone"></i> Liên hệ</a></li>
+                    @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                    {
+                        <li class="nav-item">
+                            <a href="@Url.Action("AdminDashboard", "Books", new { area = "Admin" })" class="nav-link btn-admin-nav text-warning">
+                                <i class="fa-solid fa-user-shield me-1"></i>QUẢN TRỊ
+                            </a>
+                        </li>
+                    }
+                </ul>
+
+                <div class="navbar-nav align-items-center">
+                    <div class="cart-dropdown position-relative me-3">
+                        @Html.Partial("_MyMenu")
+                        <div class="mini-cart-box shadow-lg">
+                            <div class="cart-content-inner">
+                                <div class="p-2 text-center fw-bold text-white" style="background-color: #ff8c00;">GIỎ HÀNG MỚI THÊM</div>
+                                <div id="mini-cart-content">@Html.Action("GetMiniCart", "Cart", new { area = "" })</div>
+                                <div class="p-3 bg-light"><a href="@Url.Action("Index", "Cart")" class="btn btn-warning w-100 fw-bold">XEM GIỎ HÀNG</a></div>
+                            </div>
+                        </div>
+                    </div>
+                    @Html.Partial("_LoginPartial")
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- KHU VỰC BANNER TRÀN VIỀN -->
+    @RenderSection("TopBanner", required: false)
+
+    <div class="container flex-grow-1">
+        <div class="main-content-box">
+            @RenderBody()
+        </div>
+    </div>
+
+    <footer class="footer-custom">
+        <div class="container-fluid p-0 mb-4">
+            <!-- Khung chứa bản đồ -->
+            <div class="map-container shadow-sm">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d62688.58316654519!2d106.66613380486847!3d10.884845558960613!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3174d6fe34808331%3A0x6331908b982163b!2zVGh14bqtbiBBbiwgQsOsbmggRMawxqFuZywgVmnhu4d0IE5hbQ!5e0!3m2!1svi!2s!4v1710000000000!5m2!1svi!2s"
+                        style="border:0; width: 100%; height: 300px;"
+                        allowfullscreen=""
+                        loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade">
+                </iframe>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row text-start mb-4">
+                <div class="col-md-4">
+                    <h5 style="color: #ff8c00; font-weight: bold;">SHOP NH</h5>
+                    <p><i class="fa-solid fa-location-dot me-2"></i> Thuận An, Bình Dương</p>
+                    <p><i class="fa-solid fa-phone me-2"></i> 0123 456 789</p>
+                </div>
+                <div class="col-md-4">
+                    <h5 style="color: #ff8c00; font-weight: bold;">CHÍNH SÁCH</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-decoration-none text-muted">Chính sách bảo hành</a></li>
+                        <li><a href="#" class="text-decoration-none text-muted">Đổi trả hàng hóa</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5 style="color: #ff8c00; font-weight: bold;">KẾT NỐI</h5>
+                    <div class="fs-4">
+                        <a href="#" class="text-primary me-3"><i class="fa-brands fa-facebook"></i></a>
+                        <a href="#" class="text-danger me-3"><i class="fa-brands fa-youtube"></i></a>
+                        <a href="#" class="text-dark"><i class="fa-brands fa-tiktok"></i></a>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <h5 style="color: #ff8c00; font-weight: bold; margin-top: 20px;">SHOP NH - BỨT PHÁ GIỚI HẠN</h5>
+            <p class="mb-0">&copy; @DateTime.Now.Year - Thiết kế bởi SHOP NH</p>
+        </div>
+    </footer>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+    @RenderSection("scripts", required: false)
+</body>
+</html>
+<script>
+    function updateQty(id, delta) {
+        $.ajax({
+            url: '/Cart/UpdateQuantity',
+            type: 'POST',
+            data: { id: id, delta: delta },
+            success: function (data) {
+                if (data.success) {
+                    // 1. Cập nhật Badge trên icon giỏ hàng
+                    $('.cart-count-badge').text(data.newCount);
+
+                    // 2. Tự động load lại Mini Cart dropdown
+                    $('#mini-cart-content').load('/Cart/GetMiniCart');
+
+                    // 3. Nếu đang ở trang giỏ hàng chính, load lại trang để cập nhật bảng giá
+                    if (window.location.pathname.includes('/Cart')) {
+                        location.reload();
+                    }
+                }
+            },
+            error: function () {
+                toastr.error("Không thể kết nối đến máy chủ!");
+            }
+        });
+    }
+</script>

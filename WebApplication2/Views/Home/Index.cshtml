@@ -1,0 +1,175 @@
+﻿@using WebApplication2.Models
+@{
+    ViewBag.Title = "Trang chủ - SHOP NH";
+    var newArrivals = ViewBag.NewArrivals as List<Book>;
+    var saleOff = ViewBag.SaleOff as List<Book>;
+    var votCauLong = ViewBag.VotCauLong as List<Book>;
+    var giayCauLong = ViewBag.GiayCauLong as List<Book>;
+}
+
+@* Banner nằm trong Section này sẽ tự động tràn viền ra ngoài khung trắng *@
+@section TopBanner {
+    <div id="shopBanner" class="carousel slide mb-0 shadow-sm" data-bs-ride="carousel">
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img src="~/Content/Images/Banner/banner1.jpg" class="d-block w-100" style="object-fit: cover;" alt="Banner 1">
+            </div>
+            <div class="carousel-item">
+                <img src="~/Content/Images/Banner/banner2.jpg" class="d-block w-100" style="object-fit: cover;" alt="Banner 2">
+            </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#shopBanner" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#shopBanner" data-bs-slide="next">
+            <span class="carousel-control-next-icon"></span>
+        </button>
+    </div>
+}
+
+<div class="py-4">
+    <!-- Nút xem tin tức -->
+    <div class="text-center mb-5">
+        <a href="@Url.Action("News", "Home")" class="btn btn-outline-primary btn-lg rounded-pill px-5 shadow-sm fw-bold">
+            <i class="fa-solid fa-newspaper me-2"></i> XEM TIN TỨC & KỸ THUẬT CẦU LÔNG
+        </a>
+    </div>
+
+    @* --- SẢN PHẨM MỚI NHẤT --- *@
+    @if (newArrivals != null && newArrivals.Any())
+    {
+        <section class="mb-5">
+            <h3 class="fw-bold mb-4" style="color: #ff8c00;"><i class="fa-solid fa-fire me-2"></i> SẢN PHẨM MỚI NHẤT</h3>
+            <div class="row">
+                @foreach (var item in newArrivals)
+                {
+                    <div class="col-md-3 mb-4">@Html.Partial("_ProductCard", item)</div>
+                }
+            </div>
+        </section>
+    }
+
+    @* --- SIÊU GIẢM GIÁ --- *@
+    @if (saleOff != null && saleOff.Any())
+    {
+        <section class="mb-5 p-4 shadow-sm" style="background: #fff5f5; border-radius: 25px; border: 2px dashed #ff8c00;">
+            <h3 class="fw-bold text-danger mb-4"><i class="fa-solid fa-bolt me-2"></i> SIÊU GIẢM GIÁ (SAFE OFF)</h3>
+            <div class="row">
+                @foreach (var item in saleOff)
+                {
+                    <div class="col-md-3 mb-4">@Html.Partial("_ProductCard", item)</div>
+                }
+            </div>
+        </section>
+    }
+
+    @* --- PHẦN DANH MỤC SẢN PHẨM BẰNG HÌNH ẢNH --- *@
+    <section class="mt-5">
+        <div class="text-center mb-4">
+            <h3 class="fw-bold text-uppercase" style="color: #ff8c00;">Sản phẩm cầu lông</h3>
+            <hr class="mx-auto" style="width: 100px; height: 3px; background-color: #ff8c00; border: none; opacity: 1;">
+        </div>
+
+        <div class="row g-3">
+            @{
+                var categories = new[] {
+                new { name = "VỢT CẦU LÔNG", img = "/Content/Images/Banner/vot-cau-long.jpg", group = "Vot" },
+                new { name = "GIÀY CẦU LÔNG", img = "/Content/Images/Banner/giay-cau-long.jpg", group = "Giay" },
+                new { name = "ÁO CẦU LÔNG", img = "/Content/Images/Banner/ao-cau-long.jpg", group = "Ao" },
+                new { name = "VÁY CẦU LÔNG", img = "/Content/Images/Banner/vay-cau-long.jpg", group = "Vay" },
+                new { name = "QUẦN CẦU LÔNG", img = "/Content/Images/Banner/quan-cau-long.jpg", group = "Quan" },
+                new { name = "TÚI VỢT CẦU LÔNG", img = "/Content/Images/Banner/tui-vot-cau-long.jpg", group = "TuiVot" },
+                new { name = "BALO CẦU LÔNG", img = "/Content/Images/Banner/balo-cau-long.jpg", group = "Balo" },
+                new { name = "PHỤ KIỆN CẦU LÔNG", img = "/Content/Images/Banner/phu-kien-cau-long.jpg", group = "PhuKien" }
+            };
+            }
+
+            @foreach (var item in categories)
+            {
+                <div class="col-6 col-md-3">
+                    <a href="@Url.Action("Category", "Store", new { group = item.group })" class="category-card-link">
+                        <div class="category-card-box position-relative overflow-hidden rounded shadow-sm">
+                            <img src="@Url.Content(item.img)" class="img-fluid w-100" style="transition: 0.5s; aspect-ratio: 1/1; object-fit: cover;" onerror="this.src='https://placehold.co/400x400?text=@item.name'">
+                            <div class="category-label-overlay">
+                                <span class="text-uppercase fw-bold">@item.name</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            }
+        </div>
+    </section>
+
+    @* --- VỢT CẦU LÔNG --- *@
+    @if (votCauLong != null && votCauLong.Any())
+    {
+        <section class="mb-5">
+            <h4 class="fw-bold text-dark mb-4 p-2 border-bottom border-3 border-warning d-inline-block">🏸 VỢT CẦU LÔNG CHÍNH HÃNG</h4>
+            <div class="row">
+                @foreach (var item in votCauLong)
+                {
+                    <div class="col-md-3 mb-4">@Html.Partial("_ProductCard", item)</div>
+                }
+            </div>
+        </section>
+    }
+
+    @* --- GIÀY CẦU LÔNG --- *@
+    @if (giayCauLong != null && giayCauLong.Any())
+    {
+        <section class="mb-5">
+            <h4 class="fw-bold text-dark mb-4 p-2 border-bottom border-3 border-info d-inline-block">👟 GIÀY CẦU LÔNG</h4>
+            <div class="row">
+                @foreach (var item in giayCauLong)
+                {
+                    <div class="col-md-3 mb-4">@Html.Partial("_ProductCard", item)</div>
+                }
+            </div>
+        </section>
+    }
+</div>
+
+@section scripts {
+    <script>
+        function addToCart(id) {
+            $.ajax({
+                url: '/Cart/AddToCartAjax',
+                type: 'POST',
+                data: { id: id },
+                success: function (data) {
+                    if (data.success) {
+                        $('.cart-count-badge').text(data.newCount);
+                        $('#mini-cart-content').load('/Cart/GetMiniCart');
+                        toastr.success('Đã thêm sản phẩm vào giỏ hàng!');
+                    }
+                },
+                error: function () {
+                    toastr.warning('Vui lòng kiểm tra lại kết nối!');
+                }
+            });
+        }
+    </script>
+}
+
+
+<style>
+    .category-card-box:hover img {
+        transform: scale(1.1);
+    }
+
+    .category-label-overlay {
+        position: absolute;
+        bottom: 20%;
+        left: -5px;
+        background: rgba(211, 47, 47, 0.85); /* Màu đỏ cam giống hình */
+        color: white;
+        padding: 8px 25px;
+        transform: rotate(-5deg); /* Làm nhãn hơi nghiêng giống mẫu */
+        box-shadow: 3px 3px 10px rgba(0,0,0,0.2);
+    }
+
+    .category-card-link {
+        text-decoration: none;
+        display: block;
+    }
+</style>

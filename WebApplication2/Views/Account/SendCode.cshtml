@@ -1,0 +1,24 @@
+﻿@model WebApplication2.Models.SendCodeViewModel
+@{ ViewBag.Title = "Xác thực 2 lớp"; }
+
+<div class="container mt-5">
+    <div class="card shadow border-0 mx-auto" style="max-width: 450px; border-radius: 20px;">
+        <div class="card-body p-4 text-center">
+            <i class="fa-solid fa-paper-plane fa-3x mb-3" style="color: #ff8c00;"></i>
+            <h4 class="fw-bold">CHỌN PHƯƠNG THỨC</h4>
+            <p class="text-muted small">Vui lòng chọn nơi bạn muốn nhận mã xác minh:</p>
+
+            @using (Html.BeginForm("SendCode", "Account", new { ReturnUrl = Model.ReturnUrl }, FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                @Html.Hidden("rememberMe", @Model.RememberMe)
+
+                <div class="mb-4">
+                    @Html.DropDownListFor(model => model.SelectedProvider, Model.Providers, new { @class = "form-select text-center", style = "border-radius: 10px; border: 2px solid #ff8c00;" })
+                </div>
+
+                <button type="submit" class="btn w-100 text-white py-2" style="background-color: #ff8c00; border-radius: 10px; font-weight: bold;">GỬI MÃ NGAY</button>
+            }
+        </div>
+    </div>
+</div>

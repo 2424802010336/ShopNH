@@ -1,0 +1,53 @@
+﻿@using Microsoft.AspNet.Identity
+@if (Request.IsAuthenticated)
+{
+    <div class="account-dropdown position-relative">
+        <a href="javascript:void(0)" class="nav-icon-wrapper">
+            <i class="fa-solid fa-circle-user text-white fa-xl"></i>
+        </a>
+
+        <div class="account-menu-box">
+            <div class="account-content-inner">
+                <div class="account-header">
+                    <div class="small text-muted mb-1">Xin chào,</div>
+                    <div class="fw-bold text-truncate" style="color: #ff8c00;">@User.Identity.GetUserName()</div>
+                </div>
+
+                <div class="py-1">
+                    <a href="@Url.Action("Index", "Manage")" class="account-item">
+                        <i class="fa-solid fa-user-gear"></i> Hồ sơ cá nhân
+                    </a>
+
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <a href="@Url.Action("AdminDashboard", "Books", new { area = "Admin" })" class="account-item fw-bold text-primary bg-primary bg-opacity-10">
+                            <i class="fa-solid fa-user-shield"></i> Trang Quản Trị
+                        </a>
+                    }
+                </div>
+
+                <div class="border-top">
+                    @using (Html.BeginForm("LogOff", "Account", new { area = "" }, FormMethod.Post, new { id = "logoutForm" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <a href="javascript:document.getElementById('logoutForm').submit()" class="account-item text-danger">
+                            <i class="fa-solid fa-power-off"></i> Đăng xuất
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    @* HIỂN THỊ KHI CHƯA ĐĂNG NHẬP *@
+    <div class="d-flex align-items-center">
+        <a href="@Url.Action("Login", "Account")" class="nav-link text-white me-2">
+            <i class="fa-solid fa-right-to-bracket"></i> Đăng nhập
+        </a>
+        <a href="@Url.Action("Register", "Account")" class="btn btn-outline-light btn-sm rounded-pill px-3">
+            Đăng ký
+        </a>
+    </div>
+}

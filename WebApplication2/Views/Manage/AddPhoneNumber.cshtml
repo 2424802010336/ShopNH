@@ -1,0 +1,19 @@
+﻿@model WebApplication2.Models.AddPhoneNumberViewModel
+@{ ViewBag.Title = "Cập nhật SĐT"; }
+
+<div class="container mt-5">
+    <div class="card shadow-sm border-0 mx-auto" style="max-width: 450px; border-radius: 20px;">
+        <div class="card-body p-4 text-center">
+            <i class="fa-solid fa-mobile-screen-button fa-3x mb-3" style="color: #ff8c00;"></i>
+            <h4 class="fw-bold">Thêm số điện thoại</h4>
+            <p class="text-muted small">Chúng tôi sẽ gửi mã xác nhận đến số này.</p>
+
+            @using (Html.BeginForm("AddPhoneNumber", "Manage", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                @Html.TextBoxFor(m => m.Number, new { @class = "form-control text-center mb-3", placeholder = "Nhập số điện thoại của bạn", style = "border-radius: 10px; padding: 12px;" })
+                <button type="submit" class="btn w-100 text-white py-2" style="background-color: #ff8c00; border-radius: 10px; font-weight: bold;">GỬI MÃ XÁC NHẬN</button>
+            }
+        </div>
+    </div>
+</div>

@@ -1,0 +1,32 @@
+﻿@model WebApplication2.Models.ExternalLoginListViewModel
+@using Microsoft.Owin.Security
+
+<div class="text-center mt-4">
+    <h5 class="fw-bold text-muted">Hoặc đăng nhập bằng dịch vụ khác</h5>
+    <hr style="width: 50%; margin: 10px auto;" />
+    @{
+        var loginProviders = Context.GetOwinContext().Authentication.GetExternalAuthenticationTypes();
+        if (loginProviders.Count() == 0)
+        {
+            <p class="small text-muted">Hiện chưa có dịch vụ đăng nhập bên thứ ba nào được cấu hình.</p>
+        }
+        else
+        {
+            using (Html.BeginForm("ExternalLogin", "Account", new { ReturnUrl = Model.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+            {
+                @Html.AntiForgeryToken()
+                <div id="socialLoginList" class="d-flex justify-content-center gap-2 mt-3">
+                    @foreach (AuthenticationDescription p in loginProviders)
+                    {
+                        <button type="submit" class="btn btn-outline-dark px-4"
+                                style="border-radius: 10px; font-weight: bold;"
+                                id="@p.AuthenticationType" name="provider" value="@p.AuthenticationType"
+                                title="Đăng nhập bằng tài khoản @p.Caption">
+                            <i class="fa-brands fa-@p.AuthenticationType.ToLower() me-2"></i> @p.AuthenticationType
+                        </button>
+                    }
+                </div>
+            }
+        }
+    }
+</div>

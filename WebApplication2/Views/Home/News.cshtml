@@ -1,0 +1,66 @@
+﻿@using PagedList.Mvc;
+@using PagedList;
+@model IPagedList<WebApplication2.Models.News>
+@{
+    ViewBag.Title = "Tin tức Cầu lông - ShopNH";
+}
+
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold text-uppercase" style="color: #ff8c00;">
+            <i class="fa-solid fa-newspaper me-2"></i>Tin tức & Kỹ thuật
+        </h2>
+        <hr class="mx-auto" style="width: 80px; height: 3px; background-color: #ff8c00; border: none; opacity: 1;">
+    </div>
+
+    <div class="row">
+        @foreach (var item in Model)
+        {
+            <div class="col-md-3 mb-4">
+                <div class="card h-100 border-0 shadow-sm transition-hover" style="border-radius: 20px; overflow: hidden;">
+                    <div class="position-relative">
+                        <img src="@Url.Content(item.ImagePath)" class="card-img-top" style="height: 180px; object-fit: cover;" onerror="this.src='https://placehold.co/400x250?text=ShopNH'">
+                        <span class="badge position-absolute top-0 start-0 m-3" style="background: #ff8c00;">Tin mới</span>
+                    </div>
+                    <div class="card-body p-4">
+                        <small class="text-muted d-block mb-2"><i class="fa-regular fa-calendar me-1"></i> @item.CreatedDate.ToString("dd/MM/yyyy")</small>
+                        <h5 class="fw-bold text-dark line-clamp-2" style="height: 3rem;">@item.Title</h5>
+                        <p class="card-text text-secondary small line-clamp-3">@item.ShortDescription</p>
+                        <a href="@Url.Action("NewsDetail", "Home", new { id = item.Id })" class="btn btn-sm fw-bold text-warning p-0">ĐỌC THÊM <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    @* THANH PHÂN TRANG (Đã sửa lỗi convert IPagedList) *@
+    <div class="d-flex justify-content-center mt-4">
+        @Html.PagedListPager(Model, page => Url.Action("News", new { page }),
+        new PagedListRenderOptions
+        {
+            LiElementClasses = new string[] { "page-item" }
+        })
+    </div>
+</div>
+
+<style>
+    .transition-hover:hover {
+        transform: translateY(-10px);
+        transition: 0.3s;
+        box-shadow: 0 15px 30px rgba(0,0,0,0.1) !important;
+    }
+
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .line-clamp-3 {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+</style>

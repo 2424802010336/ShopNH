@@ -1,0 +1,122 @@
+﻿@model IEnumerable<WebApplication2.Models.CartItem>
+@{
+    ViewBag.Title = "Giỏ hàng của bạn";
+}
+
+<div class="container py-4">
+    <h2 class="fw-bold mb-4" style="color: #ff8c00;"><i class="fa-solid fa-cart-shopping"></i> GIỎ HÀNG CỦA BẠN</h2>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="card shadow-sm border-0 p-4" style="border-radius: 20px;">
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr class="text-secondary border-bottom">
+                            <th style="min-width: 300px;">Sản phẩm</th>
+                            <th>Giá gốc</th>
+                            <th class="text-center">Số lượng</th>
+                            <th>Thành tiền</th>
+                            <th class="text-center">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr id="row-@item.ProductId">
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <img src="@Url.Content(item.ImagePath ?? "/Content/Images/no-img.jpg")" class="rounded me-3 border" style="width: 70px;">
+                                        <span class="fw-bold">@item.Title</span>
+                                    </div>
+                                </td>
+                                <td>@item.Price.ToString("N0") đ</td>
+                                <td>
+                                    <div class="d-flex align-items-center justify-content-center">
+                                        @* Nút GIẢM *@
+                                        <button onclick="changeQty(@item.ProductId, -1)" class="btn btn-sm btn-outline-warning">-</button>
+
+                                        @* Hiển thị số lượng với ID duy nhất *@
+                                        <span id="qty-@item.ProductId" class="mx-3 fw-bold fs-5">@item.Quantity</span>
+
+                                        @* Nút TĂNG *@
+                                        <button onclick="changeQty(@item.ProductId, 1)" class="btn btn-sm btn-outline-warning">+</button>
+                                    </div>
+                                </td>
+                                <td class="fw-bold text-danger fs-5">
+                                    <span id="item-total-@item.ProductId">@String.Format("{0:0,0}", item.Price * item.Quantity) đ</span>
+                                </td>
+                                <td class="text-center">
+                                    <a href="@Url.Action("RemoveFromCart", "Cart", new { id = item.ProductId })" class="btn btn-outline-danger btn-sm rounded-pill px-3">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="row mt-4 align-items-center">
+                <div class="col-md-6">
+                    <a href="@Url.Action("Index", "Home")" class="btn btn-outline-dark rounded-pill px-4 fw-bold">
+                        <i class="fa-solid fa-arrow-left me-2"></i> TIẾP TỤC MUA HÀNG
+                    </a>
+                </div>
+                <div class="col-md-6 text-end">
+                    <div class="text-end">
+                        <span class="fs-5 text-muted">Tổng thanh toán:</span>
+                        <div class="text-danger fw-bold fs-1">
+                            <span id="cart-total-final">@String.Format("{0:0,0}", Model.Sum(i => i.Price * i.Quantity)) đ</span>
+                        </div>
+                    </div>
+                    <a href="@Url.Action("Checkout", "Cart")" class="btn btn-warning btn-lg text-white fw-bold px-5 py-3 shadow-lg w-100" style="border-radius: 15px;">
+                        TIẾP TỤC THANH TOÁN <i class="fa-solid fa-chevron-right ms-2"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="card shadow-sm border-0 p-5 text-center" style="border-radius: 20px;">
+            <i class="fa-solid fa-cart-shopping fa-5x text-light mb-4"></i>
+            <h3 class="text-muted mb-4">Giỏ hàng của bạn đang trống!</h3>
+            <a href="/" class="btn btn-warning btn-lg text-white fw-bold px-5 py-3" style="border-radius: 15px;">QUAY LẠI CỬA HÀNG</a>
+        </div>
+    }
+</div>
+
+@section scripts {
+    <script>
+        function changeQty(id, delta) {
+            $.ajax({
+                url: '/Cart/UpdateQuantity',
+                type: 'POST',
+                data: { id: id, delta: delta },
+                success: function (res) { // Dùng biến 'res' xuyên suốt
+                    if (res.success) {
+                        if (res.newQty <= 0) {
+                            location.reload();
+                        } else {
+                            // Cập nhật số lượng
+                            $('#qty-' + id).text(res.newQty);
+
+                            // Cập nhật thành tiền của món đó
+                            $('#item-total-' + id).text(res.itemTotal);
+
+                            // Cập nhật tổng tiền cuối cùng của cả giỏ
+                            $('#cart-total-final').text(res.cartTotal);
+
+                            // Cập nhật con số trên icon giỏ hàng Navbar
+                            $('.cart-count-badge').text(res.cartCount);
+                        }
+                    }
+                },
+                error: function () {
+                    alert("Không thể kết nối đến máy chủ!");
+                }
+            });
+        }
+    </script>
+}

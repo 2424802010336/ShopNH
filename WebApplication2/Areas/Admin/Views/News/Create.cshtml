@@ -1,0 +1,50 @@
+﻿@model WebApplication2.Models.News
+@{
+    ViewBag.Title = "Thêm tin tức";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="card border-0 shadow-lg rounded-4">
+    <div class="card-header bg-dark py-3">
+        <h4 class="fw-bold m-0 text-white"><i class="fa-solid fa-plus me-2 text-primary"></i>TẠO TIN TỨC MỚI</h4>
+    </div>
+    <div class="card-body p-4">
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+         <div class="row">
+            <div class="col-md-8">
+                <div class="mb-3">
+                    <label class="fw-bold mb-1">Tiêu đề bài viết</label>
+                    @Html.EditorFor(model => model.Title, new { htmlAttributes = new { @class = "form-control rounded-3" } })
+                </div>
+
+                @* MỤC CHỌN ẢNH TỪ MÁY *@
+                <div class="mb-3">
+                    <label class="fw-bold mb-1">Hình ảnh bài viết</label>
+                    <input type="file" name="uploadImage" class="form-control rounded-3" accept="image/*" />
+                    <small class="text-muted">Nên chọn ảnh tỉ lệ 4:3 để hiển thị đẹp nhất.</small>
+                </div>
+
+                <div class="mb-3">
+                    <label class="fw-bold mb-1">Mô tả ngắn</label>
+                    @Html.TextAreaFor(model => model.ShortDescription, new { @class = "form-control rounded-3", rows = "3" })
+                </div>
+                <div class="mb-3">
+                    <label class="fw-bold mb-1">Nội dung chi tiết</label>
+                    @Html.TextAreaFor(model => model.Content, new { @class = "form-control rounded-3", rows = "8" })
+                </div>
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary px-4 rounded-pill fw-bold"><i class="fa-solid fa-save me-2"></i>Lưu bài viết</button>
+                    <a href="@Url.Action("Index")" class="btn btn-light px-4 rounded-pill border ms-2">Quay lại</a>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="alert alert-info border-0 rounded-4">
+                    <i class="fa-solid fa-circle-info me-2"></i> <b>Lưu ý:</b> Ngày tạo sẽ được hệ thống tự động cập nhật.
+                </div>
+            </div>
+         </div>
+         }
+    </div>
+</div>

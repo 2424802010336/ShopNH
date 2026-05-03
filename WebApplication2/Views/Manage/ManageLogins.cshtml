@@ -1,0 +1,62 @@
+﻿@model WebApplication2.Models.ManageLoginsViewModel
+@using Microsoft.Owin.Security
+@{
+    ViewBag.Title = "Liên kết tài khoản";
+}
+
+<div class="container py-4">
+    <h2 class="fw-bold mb-4" style="color: #ff8c00;"><i class="fa-solid fa-link"></i> LIÊN KẾT DỊCH VỤ NGOÀI</h2>
+
+    <div class="card shadow-sm border-0" style="border-radius: 20px;">
+        <div class="card-body p-4">
+            @if (Model.CurrentLogins.Count > 0)
+            {
+                <h5 class="fw-bold mb-3">Dịch vụ đã đăng ký</h5>
+                <table class="table align-middle">
+                    <tbody>
+                        @foreach (var account in Model.CurrentLogins)
+                        {
+                            <tr>
+                                <td class="fw-bold"><i class="fa-solid fa-circle-check text-success"></i> @account.LoginProvider</td>
+                                <td class="text-end">
+                                    @if (ViewBag.ShowRemoveButton)
+                                    {
+                                        using (Html.BeginForm("RemoveLogin", "Manage"))
+                                        {
+                                            @Html.AntiForgeryToken()
+                                            @Html.Hidden("loginProvider", account.LoginProvider)
+                                            @Html.Hidden("providerKey", account.ProviderKey)
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" style="border-radius: 8px;">Gỡ liên kết</button>
+                                        }
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+
+            @if (Model.OtherLogins.Count > 0)
+            {
+                <h5 class="fw-bold mt-4 mb-3">Thêm liên kết mới</h5>
+                using (Html.BeginForm("LinkLogin", "Manage"))
+                {
+                    @Html.AntiForgeryToken()
+                    <div id="socialLoginList">
+                        @foreach (AuthenticationDescription p in Model.OtherLogins)
+                        {
+                            <button type="submit" class="btn btn-dark me-2" style="border-radius: 10px; min-width: 150px;"
+                                    id="@p.AuthenticationType" name="provider" value="@p.AuthenticationType">
+                                <i class="fa-brands fa-@p.AuthenticationType.ToLower()"></i> Kết nối @p.AuthenticationType
+                            </button>
+                        }
+                    </div>
+                }
+            }
+
+            <div class="mt-4">
+                <a href="@Url.Action("Index")" class="btn btn-link text-muted"><i class="fa-solid fa-arrow-left"></i> Quay lại hồ sơ</a>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,61 @@
+﻿@model WebApplication2.Models.Book
+@{
+    ViewBag.Title = Model.Title + " - Chi tiết sản phẩm";
+}
+
+<div class="container py-5">
+    <div class="card shadow-sm border-0" style="border-radius: 30px; overflow: hidden;">
+        <div class="row g-0">
+            @* Bên trái: Hình ảnh *@
+            <div class="col-md-5 bg-light d-flex align-items-center justify-content-center p-5">
+                <img src="@Url.Content(Model.ImagePath)" class="img-fluid rounded-4 shadow" style="max-height: 400px; object-fit: contain;">
+            </div>
+
+            @* Bên phải: Thông tin *@
+            <div class="col-md-7 p-5">
+                <nav aria-label="breadcrumb" class="mb-3">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/" class="text-decoration-none text-muted">Trang chủ</a></li>
+                        <li class="breadcrumb-item active text-warning fw-bold">@Model.Category</li>
+                    </ol>
+                </nav>
+
+                <h1 class="fw-bold text-dark display-6 mb-3">@Model.Title</h1>
+
+                <div class="mb-4">
+                    @if (Model.SalePrice.HasValue && Model.SalePrice > 0)
+                    {
+                        <h2 class="text-danger fw-bold mb-0">@String.Format("{0:0,0}", Model.SalePrice) VNĐ</h2>
+                        <span class="text-muted text-decoration-line-through">Giá gốc: @String.Format("{0:0,0}", Model.Price) VNĐ</span>
+                    }
+                    else
+                    {
+                        <h2 class="text-dark fw-bold">@String.Format("{0:0,0}", Model.Price) VNĐ</h2>
+                    }
+                </div>
+
+                <div class="alert alert-warning border-0 p-3 mb-4" style="border-radius: 15px; background-color: #fff9f0;">
+                    <i class="fa-solid fa-truck-fast me-2"></i> Miễn phí giao hàng tại Bình Dương cho đơn trên 500k.
+                </div>
+
+                <div class="d-grid gap-3 mb-5">
+                    <a href="@Url.Action("AddToCart", "Cart", new { id = Model.Id })" class="btn btn-lg text-white py-3 shadow" style="background-color: #ff8c00; border-radius: 15px; font-weight: bold;">
+                        <i class="fa-solid fa-cart-shopping me-2"></i> THÊM VÀO GIỎ HÀNG
+                    </a>
+                </div>
+
+                @* Tab mô tả *@
+                <ul class="nav nav-tabs border-0 mb-3" id="myTab" role="tablist">
+                    <li class="nav-item">
+                        <button class="nav-link active fw-bold border-0 bg-transparent text-dark border-bottom border-3 border-warning" data-bs-toggle="tab" data-bs-target="#desc">MÔ TẢ SẢN PHẨM</button>
+                    </li>
+                </ul>
+                <div class="tab-content text-secondary px-2">
+                    <div class="tab-pane fade show active" id="desc">
+                        @Html.Raw(Model.Description)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
