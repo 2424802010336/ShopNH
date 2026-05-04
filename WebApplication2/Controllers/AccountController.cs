@@ -53,7 +53,6 @@ namespace WebApplication2.Controllers
         {
             if (!ModelState.IsValid) return View(model);
 
-            // Sửa lỗi kiểu dữ liệu SignInManager tại đây
             var result = await SignInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, shouldLockout: false);
 
             switch (result)
@@ -77,8 +76,18 @@ namespace WebApplication2.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                // SỬA LỖI TẠI ĐÂY: Đóng ngoặc nhọn đúng cách
+                var user = new ApplicationUser
+                {
+                    UserName = model.Email,
+                    Email = model.Email,
+                    PhoneNumber = model.PhoneNumber,
+                    BirthDate = model.BirthDate,
+                    FullName = model.FullName // Đảm bảo bạn đã thêm trường này vào IdentityModels.cs
+                };
+
                 var result = await UserManager.CreateAsync(user, model.Password);
+
                 if (result.Succeeded)
                 {
                     await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
@@ -119,6 +128,46 @@ namespace WebApplication2.Controllers
                 return Redirect(returnUrl);
             }
             return RedirectToAction("Index", "Home");
+        }
+
+        // 1. Trang nhập Email để yêu cầu reset
+        [AllowAnonymous]
+        public ActionResult ForgotPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> ForgotPassword(ForgotPasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await UserManager.FindByEmailAsync(model.Email);
+                if (user == null)
+                {
+                    // Để bảo mật, không báo là email không tồn tại, cứ báo đã gửi thành công
+                    return View("ForgotPasswordConfirmation");
+                }
+
+                // Tạo token gửi qua mail
+                string code = await UserManager.GeneratePasswordResetTokenAsync(user.Id);
+                var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
+
+                await UserManager.SendEmailAsync(user.Id, "Khôi phục mật khẩu Shop NH",
+                    "Vui lòng đặt lại mật khẩu của bạn bằng cách nhấn vào <a href=\"" + callbackUrl + "\">đây</a>");
+
+                return RedirectToAction("ForgotPasswordConfirmation", "Account");
+            }
+            return View(model);
+        }
+
+        // 2. Trang thông báo đã gửi mail thành công
+        [AllowAnonymous]
+        public ActionResult ForgotPasswordConfirmation()
+        {
+            return View();
         }
     }
 }

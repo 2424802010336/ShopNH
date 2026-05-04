@@ -1,51 +1,63 @@
 ﻿@using WebApplication2.Models
 @model LoginViewModel
-@{ ViewBag.Title = "Đăng nhập hệ thống"; }
+@{
+    ViewBag.Title = "Đăng nhập hệ thống";
+}
 
-<div class="container mt-5">
+<div class="container py-5 mt-5">
     <div class="row justify-content-center">
-        <div class="col-md-5">
-            <div class="card shadow-lg border-0" style="border-radius: 25px; overflow: hidden;">
-                <div class="card-header text-center py-4" style="background-color: #ff8c00; color: white;">
-                    <h3 class="fw-bold mb-0"><i class="fa-solid fa-lock"></i> ĐĂNG NHẬP</h3>
+        <div class="col-md-5 col-sm-10">
+            <div class="card shadow-lg border-0" style="border-radius: 20px; overflow: hidden;">
+                @* Header với màu cam thương hiệu *@
+                <div class="card-header text-center py-4 border-0" style="background-color: #ff8c00; color: white;">
+                    <h3 class="fw-bold mb-0"><i class="fa-solid fa-lock me-2"></i> ĐĂNG NHẬP</h3>
                 </div>
-                <div class="card-body p-4">
-                    @* Đảm bảo ReturnUrl được truyền vào để điều hướng đúng *@
+
+                <div class="card-body p-4 p-lg-5 bg-white">
                     @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
                     {
                         @Html.AntiForgeryToken()
-                        @Html.ValidationSummary(true, "", new { @class = "text-danger small" })
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger small mb-3" })
 
-                        <div class="mb-3">
-                            <label class="fw-bold text-muted small">EMAIL</label>
-                            @Html.TextBoxFor(m => m.Email, new { @class = "form-control shadow-sm", style = "border-radius: 10px;", placeholder = "name@example.com" })
-                            @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger small" })
+                        @* Email Input *@
+                        <div class="mb-4">
+                            <label class="fw-bold text-muted small mb-2 text-uppercase">Địa chỉ Email</label>
+                            @Html.TextBoxFor(m => m.Email, new { @class = "form-control form-control-lg border-0 bg-light shadow-none", style = "border-radius: 12px; font-size: 1rem;", placeholder = "name@example.com" })
+                            @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger small mt-1 d-block" })
                         </div>
 
+                        @* Password Input với nút Toggle ẩn/hiện *@
                         <div class="mb-3">
-                            <label class="fw-bold text-muted small">MẬT KHẨU</label>
-                            <div class="input-group shadow-sm" style="border-radius: 10px; overflow: hidden;">
-                                @Html.PasswordFor(m => m.Password, new { @class = "form-control border-end-0", style = "border-radius: 10px 0 0 10px;", placeholder = "********", id = "password-field" })
-                                <span class="input-group-text bg-white border-start-0" style="border-radius: 0 10px 10px 0; cursor: pointer;" id="toggle-password">
-                                    <i class="fa-solid fa-eye" id="eye-icon"></i>
+                            <label class="fw-bold text-muted small mb-2 text-uppercase">Mật khẩu</label>
+                            <div class="input-group shadow-none" style="border-radius: 12px; overflow: hidden;">
+                                @Html.PasswordFor(m => m.Password, new { @class = "form-control form-control-lg border-0 bg-light shadow-none", style = "font-size: 1rem;", placeholder = "********", id = "password-field" })
+                                <span class="input-group-text bg-light border-0" style="cursor: pointer;" id="toggle-password">
+                                    <i class="fa-solid fa-eye text-muted" id="eye-icon"></i>
                                 </span>
                             </div>
-                            @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger small" })
+                            @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger small mt-1 d-block" })
                         </div>
 
+                        @* Phụ trợ *@
                         <div class="d-flex justify-content-between align-items-center mb-4">
                             <div class="form-check">
-                                @Html.CheckBoxFor(m => m.RememberMe, new { @class = "form-check-input" })
-                                <label class="form-check-label small">Ghi nhớ tôi</label>
+                                @Html.CheckBoxFor(m => m.RememberMe, new { @class = "form-check-input shadow-none" })
+                                <label class="form-check-label small text-muted">Ghi nhớ đăng nhập</label>
                             </div>
-                            @Html.ActionLink("Quên mật khẩu?", "ForgotPassword", null, new { @class = "text-decoration-none small", style = "color: #ff8c00;" })
+                            @Html.ActionLink("Quên mật khẩu?", "ForgotPassword", null, new { @class = "text-decoration-none small fw-bold", style = "color: #ff8c00;" })
                         </div>
 
-                        <div class="d-grid mb-3">
-                            <button type="submit" class="btn btn-lg text-white" style="background-color: #ff8c00; border-radius: 12px; font-weight: bold;">VÀO CỬA HÀNG</button>
+                        @* Submit Button *@
+                        <div class="d-grid mb-4">
+                            <button type="submit" class="btn btn-lg text-white shadow-sm btn-hover-zoom" style="background-color: #ff8c00; border-radius: 12px; font-weight: bold; transition: all 0.3s;">
+                                VÀO CỬA HÀNG
+                            </button>
                         </div>
 
-                        <p class="text-center small">Chưa có tài khoản? @Html.ActionLink("Đăng ký ngay", "Register", null, new { @class = "fw-bold text-decoration-none", style = "color: #ff8c00;" })</p>
+                        <div class="text-center">
+                            <span class="text-muted small">Chưa có tài khoản?</span>
+                            @Html.ActionLink("Đăng ký ngay", "Register", null, new { @class = "fw-bold text-decoration-none ms-1", style = "color: #ff8c00;" })
+                        </div>
                     }
                 </div>
             </div>
@@ -55,20 +67,29 @@
 
 @section Scripts {
     <script>
-        // Xử lý ẩn hiện mật khẩu
+        // JS ẩn hiện mật khẩu
         document.getElementById('toggle-password').addEventListener('click', function () {
             const passwordField = document.getElementById('password-field');
             const eyeIcon = document.getElementById('eye-icon');
-
             if (passwordField.type === 'password') {
                 passwordField.type = 'text';
-                eyeIcon.classList.remove('fa-eye');
-                eyeIcon.classList.add('fa-eye-slash');
+                eyeIcon.classList.replace('fa-eye', 'fa-eye-slash');
             } else {
                 passwordField.type = 'password';
-                eyeIcon.classList.remove('fa-eye-slash');
-                eyeIcon.classList.add('fa-eye');
+                eyeIcon.classList.replace('fa-eye-slash', 'fa-eye');
             }
         });
     </script>
 }
+
+<style>
+    .btn-hover-zoom:hover {
+        transform: scale(1.02);
+        filter: brightness(1.1);
+    }
+
+    .form-control:focus {
+        background-color: #fff !important;
+        border: 1px solid #ff8c00 !important;
+    }
+</style>

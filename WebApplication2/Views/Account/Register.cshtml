@@ -1,41 +1,131 @@
-﻿@model WebApplication2.Models.RegisterViewModel
-@{ ViewBag.Title = "Đăng ký thành viên"; }
+﻿@using System
+@model WebApplication2.Models.RegisterViewModel
+@{
+    ViewBag.Title = "Đăng ký thành viên";
+}
 
-<div class="container mt-5">
+<div class="container py-5 mt-5">
     <div class="row justify-content-center">
-        <div class="col-md-5">
-            <div class="card shadow-lg border-0" style="border-radius: 25px;">
-                <div class="card-header text-center py-4" style="background-color: #333; color: #ff8c00;">
-                    <h3 class="fw-bold mb-0"><i class="fa-solid fa-user-plus"></i> TẠO TÀI KHOẢN</h3>
+        @* Thay đổi từ col-md-5 lên col-md-8 để bảng rộng hơn *@
+        <div class="col-md-8 col-lg-7">
+            <div class="card shadow-lg border-0" style="border-radius: 20px; overflow: hidden;">
+                <div class="card-header text-center py-4 border-0" style="background-color: #333; color: #ff8c00;">
+                    <h3 class="fw-bold mb-0 text-uppercase"><i class="fa-solid fa-user-plus me-2"></i> Tạo tài khoản mới</h3>
                 </div>
-                <div class="card-body p-4">
+
+                <div class="card-body p-4 p-lg-5 bg-white">
                     @using (Html.BeginForm("Register", "Account", FormMethod.Post, new { role = "form" }))
                     {
                         @Html.AntiForgeryToken()
-                        @Html.ValidationSummary("", new { @class = "text-danger small" })
+                        @Html.ValidationSummary("", new { @class = "text-danger small mb-4 list-unstyled" })
 
-                        <div class="mb-3">
-                            <label class="fw-bold text-muted small">EMAIL CỦA BẠN</label>
-                            @Html.TextBoxFor(m => m.Email, new { @class = "form-control shadow-sm", style = "border-radius: 10px;" })
+                        <div class="row g-4">
+                            @* Sử dụng g-4 để tạo khoảng cách giữa các ô *@
+                            @* Họ tên chiếm trọn 1 dòng *@
+                            <div class="col-12">
+                                <label class="fw-bold text-muted small mb-2">HỌ VÀ TÊN</label>
+                                @Html.TextBoxFor(m => m.FullName, new { @class = "form-control border-0 bg-light py-3 shadow-none", style = "border-radius: 10px;", placeholder = "Nguyễn Văn A" })
+                            </div>
+
+                            @* Email chiếm trọn 1 dòng *@
+                            <div class="col-12">
+                                <label class="fw-bold text-muted small mb-2">EMAIL (TÀI KHOẢN)</label>
+                                @Html.TextBoxFor(m => m.Email, new { @class = "form-control border-0 bg-light py-3 shadow-none", style = "border-radius: 10px;", placeholder = "example@gmail.com" })
+                            </div>
+
+                            @* Số điện thoại và Ngày sinh nằm trên cùng 1 dòng *@
+                            <div class="col-md-6">
+                                <label class="fw-bold text-muted small mb-2">SỐ ĐIỆN THOẠI</label>
+                                @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "form-control border-0 bg-light py-3 shadow-none", style = "border-radius: 10px;", placeholder = "090..." })
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="fw-bold text-muted small mb-2">NGÀY SINH</label>
+                                @Html.TextBoxFor(m => m.BirthDate, new { @class = "form-control border-0 bg-light py-3 shadow-none", style = "border-radius: 10px;", type = "date" })
+                            </div>
+
+                            @* Mật khẩu và Xác nhận nằm trên cùng 1 dòng *@
+                            <div class="col-md-6 mb-3">
+                                <label class="fw-bold text-muted small mb-2">MẬT KHẨU</label>
+                                <div class="input-group shadow-none" style="border-radius: 10px; overflow: hidden;">
+                                    @Html.PasswordFor(m => m.Password, new { @class = "form-control border-0 bg-light shadow-none py-3", placeholder = "********", id = "password-field" })
+                                    <span class="input-group-text bg-light border-0" style="cursor: pointer;" id="toggle-password">
+                                        <i class="fa-solid fa-eye text-muted" id="eye-icon-1"></i>
+                                    </span>
+                                </div>
+                                @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger small" })
+                            </div>
+
+                            @* Xác nhận mật khẩu *@
+                            <div class="col-md-6 mb-4">
+                                <label class="fw-bold text-muted small mb-2">XÁC NHẬN</label>
+                                <div class="input-group shadow-none" style="border-radius: 10px; overflow: hidden;">
+                                    @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control border-0 bg-light shadow-none py-3", placeholder = "********", id = "confirm-password-field" })
+                                    <span class="input-group-text bg-light border-0" style="cursor: pointer;" id="toggle-confirm-password">
+                                        <i class="fa-solid fa-eye text-muted" id="eye-icon-2"></i>
+                                    </span>
+                                </div>
+                                @Html.ValidationMessageFor(m => m.ConfirmPassword, "", new { @class = "text-danger small" })
+                            </div>
                         </div>
 
-                        <div class="mb-3">
-                            <label class="fw-bold text-muted small">MẬT KHẨU</label>
-                            @Html.PasswordFor(m => m.Password, new { @class = "form-control shadow-sm", style = "border-radius: 10px;" })
+                        <div class="d-grid mt-5">
+                            <button type="submit" class="btn btn-lg text-white shadow-sm py-3" style="background-color: #ff8c00; border-radius: 12px; font-weight: bold; font-size: 1.1rem;">
+                                ĐĂNG KÝ NGAY
+                            </button>
                         </div>
 
-                        <div class="mb-4">
-                            <label class="fw-bold text-muted small">XÁC NHẬN MẬT KHẨU</label>
-                            @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control shadow-sm", style = "border-radius: 10px;" })
+                        <div class="text-center mt-4">
+                            <span class="text-muted small">Đã có tài khoản?</span>
+                            @Html.ActionLink("Đăng nhập", "Login", null, new { @class = "fw-bold text-decoration-none ms-1", style = "color: #ff8c00;" })
                         </div>
-
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-lg text-white" style="background-color: #ff8c00; border-radius: 12px; font-weight: bold;">ĐĂNG KÝ NGAY</button>
-                        </div>
-                        <p class="text-center mt-3 small">Đã có tài khoản? @Html.ActionLink("Đăng nhập", "Login")</p>
                     }
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script>
+        // Hàm xử lý ẩn hiện mật khẩu chung
+        function setupTogglePassword(toggleId, fieldId, iconId) {
+            const toggleBtn = document.getElementById(toggleId);
+            const field = document.getElementById(fieldId);
+            const icon = document.getElementById(iconId);
+
+            if (toggleBtn && field && icon) {
+                toggleBtn.addEventListener('click', function () {
+                    // Chuyển đổi type của input
+                    const type = field.getAttribute('type') === 'password' ? 'text' : 'password';
+                    field.setAttribute('type', type);
+
+                    // Chuyển đổi icon con mắt
+                    icon.classList.toggle('fa-eye');
+                    icon.classList.toggle('fa-eye-slash');
+                });
+            }
+        }
+
+        // Áp dụng cho ô Mật khẩu
+        setupTogglePassword('toggle-password', 'password-field', 'eye-icon-1');
+
+        // Áp dụng cho ô Xác nhận mật khẩu
+        setupTogglePassword('toggle-confirm-password', 'confirm-password-field', 'eye-icon-2');
+    </script>
+}
+
+<style>
+    /* Hiệu ứng khi nhấn vào ô nhập liệu */
+    .form-control:focus {
+        background-color: #fff !important;
+        border: 1px solid #ff8c00 !important;
+        box-shadow: 0 0 0 0.2rem rgba(255, 140, 0, 0.25) !important;
+    }
+    /* Tăng kích thước font cho placeholder */
+    ::placeholder {
+        font-size: 0.9rem;
+        opacity: 0.7;
+    }
+</style>
