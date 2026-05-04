@@ -1,0 +1,101 @@
+﻿@model WebApplication2.Models.RegisterViewModel
+@{
+    ViewBag.Title = "Tạo Quản trị viên";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid py-4 text-dark">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <!-- Nút quay lại -->
+            <div class="d-flex align-items-center mb-4">
+                <a href="@Url.Action("ManageAdmins")" class="btn btn-outline-secondary rounded-circle me-3" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+                <h3 class="fw-bold m-0 text-dark">TẠO ADMIN MỚI</h3>
+            </div>
+
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="card-body p-4 bg-white">
+                    @using (Html.BeginForm("CreateAdmin", "User", FormMethod.Post, new { role = "form" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger mb-3" })
+
+                        <!-- Họ tên Admin -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small text-muted"><i class="fa-solid fa-user-tag me-2"></i>HỌ VÀ TÊN</label>
+                            @Html.TextBoxFor(m => m.FullName, new { @class = "form-control form-control-lg rounded-3 shadow-none border-secondary-subtle", placeholder = "Nguyễn Văn A", required = "required" })
+                            @Html.ValidationMessageFor(m => m.FullName, "", new { @class = "text-danger small" })
+                        </div>
+
+                        <!-- Email đăng nhập -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small text-muted"><i class="fa-solid fa-envelope me-2"></i>EMAIL ĐĂNG NHẬP</label>
+                            @Html.TextBoxFor(m => m.Email, new { @class = "form-control form-control-lg rounded-3 shadow-none border-secondary-subtle", placeholder = "admin@shopNH.com", required = "required" })
+                            @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger small" })
+                        </div>
+
+                        <!-- Mật khẩu -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small text-muted"><i class="fa-solid fa-lock me-2"></i>MẬT KHẨU</label>
+                            <div class="position-relative">
+                                @Html.PasswordFor(m => m.Password, new { @id = "txtPassword", @class = "form-control form-control-lg rounded-3 shadow-none border-secondary-subtle pe-5", placeholder = "••••••••", required = "required" })
+                                <span class="position-absolute end-0 top-50 translate-middle-y me-3 cursor-pointer" onclick="togglePassword('txtPassword', this)">
+                                    <i class="fa-solid fa-eye text-muted"></i>
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Xác nhận mật khẩu -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold small text-muted"><i class="fa-solid fa-check-double me-2"></i>XÁC NHẬN MẬT KHẨU</label>
+                            <div class="position-relative">
+                                @Html.PasswordFor(m => m.ConfirmPassword, new { @id = "txtConfirmPassword", @class = "form-control form-control-lg rounded-3 shadow-none border-secondary-subtle pe-5", placeholder = "••••••••", required = "required" })
+                                <span class="position-absolute end-0 top-50 translate-middle-y me-3 cursor-pointer" onclick="togglePassword('txtConfirmPassword', this)">
+                                    <i class="fa-solid fa-eye text-muted"></i>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-warning border-0 rounded-3 small mb-4">
+                            <i class="fa-solid fa-circle-info me-2"></i>
+                            Mật khẩu phải bao gồm chữ hoa, số và ký tự đặc biệt để đảm bảo an toàn.
+                        </div>
+
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <a href="@Url.Action("ManageAdmins")" class="btn btn-light w-100 py-3 rounded-pill fw-bold">HỦY BỎ</a>
+                            </div>
+                            <div class="col-6">
+                                <button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow">
+                                    <i class="fa-solid fa-user-plus me-2"></i>TẠO TÀI KHOẢN
+                                </button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        function togglePassword(inputId, iconElement) {
+            const passwordInput = document.getElementById(inputId);
+            const icon = iconElement.querySelector('i');
+
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = "password";
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+    </script>
+    @Scripts.Render("~/bundles/jqueryval")
+}

@@ -1,0 +1,218 @@
+﻿@model WebApplication2.Models.Order
+@{
+    ViewBag.Title = "Chi tiết đơn hàng";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid py-4">
+    @* --- HEADER --- *@
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold text-dark m-0">
+            <i class="fa-solid fa-file-invoice text-primary me-2"></i> CHI TIẾT ĐƠN HÀNG #@Model.Id
+        </h3>
+        <a href="@Url.Action("Index", "Order")" class="btn btn-outline-secondary rounded-pill px-4">
+            <i class="fa-solid fa-arrow-left me-1"></i> Quay lại danh sách
+        </a>
+    </div>
+
+    <div class="row">
+        @* --- THÔNG TIN KHÁCH HÀNG --- *@
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h5 class="fw-bold m-0"><i class="fa-solid fa-user text-info me-2"></i>Thông tin giao hàng</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="text-muted small d-block">Tên khách hàng:</label>
+                        <span class="fw-bold text-dark fs-5">@Model.CustomerName</span>
+                    </div>
+                    <div class="mb-3">
+                        <label class="text-muted small d-block">Số điện thoại:</label>
+                        <span class="fw-bold text-primary">@Model.Phone</span>
+                    </div>
+                    <div class="mb-3">
+                        <label class="text-muted small d-block">Địa chỉ nhận hàng:</label>
+                        <span class="text-dark">@Model.Address</span>
+                    </div>
+                    <div class="mb-3">
+                        <label class="text-muted small d-block">Ngày đặt hàng:</label>
+                        <span>@Model.OrderDate.ToString("dd/MM/yyyy HH:mm")</span>
+                    </div>
+                    <div class="mb-3">
+                        <label class="text-muted small d-block">Ghi chú từ khách:</label>
+                        <i class="text-secondary">"@(string.IsNullOrEmpty(Model.Note) ? "Không có ghi chú" : Model.Note)"</i>
+                    </div>
+                    <hr>
+                    <div>
+                        <label class="text-muted small d-block mb-2">Trạng thái hiện tại:</label>
+                        @if (Model.Status == "Hoàn thành")
+                        {
+                            <span class="badge bg-success px-3 py-2 rounded-pill w-100">Đã giao hàng</span>
+                        }
+                        else if (Model.Status == "Chờ duyệt")
+                        {
+                            <span class="badge bg-warning text-dark px-3 py-2 rounded-pill w-100">Đang chờ xử lý</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary px-3 py-2 rounded-pill w-100">@Model.Status</span>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @* --- DANH SÁCH SẢN PHẨM --- *@
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h5 class="fw-bold m-0"><i class="fa-solid fa-box text-warning me-2"></i>Sản phẩm đã đặt</h5>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4">Sản phẩm</th>
+                                <th class="text-center">Số lượng</th>
+                                <th class="text-end">Đơn giá</th>
+                                <th class="text-end pe-4">Thành tiền</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.OrderDetails != null && Model.OrderDetails.Any())
+                            {
+                                foreach (var detail in Model.OrderDetails)
+                                {
+                                    <tr>
+                                        <td class="ps-4">
+                                            <div class="d-flex align-items-center">
+                                                @* Lưu ý: Bạn nên bổ sung cột ImagePath vào OrderDetail nếu muốn hiện ảnh tại đây *@
+                                                <div class="fw-bold text-dark">@detail.Book.Title</div>
+                                            </div>
+                                        </td>
+                                        <td class="text-center fw-bold">x @detail.Quantity</td>
+                                        <td class="text-end">@detail.UnitPrice.ToString("N0") đ</td>
+                                        <td class="text-end pe-4 fw-bold text-primary">
+                                            @((detail.Quantity * detail.UnitPrice).ToString("N0")) đ
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                        <tfoot class="bg-light">
+                            <tr>
+                                <td colspan="3" class="text-end fw-bold py-3 fs-5">TỔNG CỘNG:</td>
+                                <td class="text-end pe-4 py-3">
+                                    <span class="text-danger fw-bold fs-4">@Model.TotalAmount.ToString("N0") đ</span>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <div class="mt-4 text-end" id="order-actions">
+                @if (Model.Status == "Chờ xử lý" || Model.Status == "Chờ duyệt")
+                {
+    <button onclick="updateOrderStatus(@Model.Id, 'Hoàn thành')" class="btn btn-success btn-lg rounded-pill px-5 shadow-sm fw-bold">
+        <i class="fa-solid fa-check me-2"></i>XÁC NHẬN ĐÃ GIAO
+    </button>
+                    <button onclick="updateOrderStatus(@Model.Id, 'Đã hủy')" class="btn btn-danger btn-lg rounded-pill px-4 shadow-sm fw-bold ms-2">
+                        <i class="fa-solid fa-xmark me-2"></i>HỦY ĐƠN
+                    </button> }
+                                else
+                                {
+                    <button onclick="updateOrderStatus(@Model.Id, 'Chờ xử lý')" class="btn btn-outline-dark btn-lg rounded-pill px-4 shadow-sm fw-bold me-2">
+                        <i class="fa-solid fa-rotate-left me-2"></i>CẬP NHẬT LẠI TRẠNG THÁI
+                    </button>
+                                    <div class="alert alert-secondary d-inline-block rounded-pill px-4 py-2 m-0">
+                                        Đơn hàng đã xử lý (@Model.Status)
+                                    </div>}
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<style>
+    .card {
+        transition: 0.3s;
+    }
+
+    .table thead th {
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border: none;
+    }
+
+    .badge {
+        font-size: 0.9rem;
+    }
+
+    .swal2-styled.swal2-confirm {
+        background-color: #ff8c00 !important;
+    }
+</style>
+
+@section scripts {
+    @* Thêm thư viện SweetAlert2 từ CDN *@
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        function updateOrderStatus(orderId, newStatus) {
+            let titleMsg = "Xác nhận?";
+            let textMsg = "";
+            let iconType = "question";
+
+            if (newStatus === 'Hoàn thành') {
+                textMsg = "Xác nhận đơn hàng đã giao thành công?";
+                iconType = "success";
+            } else if (newStatus === 'Đã hủy') {
+                textMsg = "Bạn có chắc chắn muốn hủy đơn hàng này?";
+                iconType = "error";
+            } else {
+                textMsg = "Đưa đơn hàng quay lại trạng thái Chờ xử lý?";
+                iconType = "warning";
+            }
+
+            Swal.fire({
+                title: titleMsg,
+                text: textMsg,
+                icon: iconType,
+                showCancelButton: true,
+                confirmButtonColor: '#ff8c00',
+                cancelButtonColor: '#6e7881',
+                confirmButtonText: 'Đồng ý',
+                cancelButtonText: 'Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '@Url.Action("UpdateStatus", "Order", new { area = "Admin" })',
+                        type: 'POST',
+                        data: { id: orderId, status: newStatus },
+                        success: function (res) {
+                            if (res.success) {
+                                Swal.fire({
+                                    title: "Thành công!",
+                                    text: "Trạng thái đơn hàng đã được cập nhật.",
+                                    icon: "success",
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire("Lỗi!", res.message, "error");
+                            }
+                        },
+                        error: function () {
+                            Swal.fire("Lỗi!", "Không thể kết nối đến máy chủ!", "error");
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+}

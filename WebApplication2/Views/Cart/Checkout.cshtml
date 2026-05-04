@@ -1,34 +1,71 @@
-﻿@{ ViewBag.Title = "Thông tin giao hàng"; }
+﻿@model List<WebApplication2.Models.CartItem>
+@{
+    ViewBag.Title = "Thông tin giao hàng";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    // Tính tổng tiền để hiển thị tóm tắt cho khách hàng thấy trước khi bấm xác nhận
+    var totalAmount = Model != null ? Model.Sum(x => x.Price * x.Quantity) : 0;
+}
 
 <div class="container py-5">
     <div class="row justify-content-center">
+        @* CỘT TRÁI: FORM NHẬP THÔNG TIN *@
         <div class="col-md-6">
             <div class="card shadow-lg border-0 p-4" style="border-radius: 25px;">
                 <h3 class="text-center fw-bold mb-4" style="color: #ff8c00;">🚚 THÔNG TIN GIAO HÀNG</h3>
 
-                @using (Html.BeginForm("ProcessOrder", "Cart", FormMethod.Post))
+                @using (Html.BeginForm("ProcessOrder", "Cart", FormMethod.Post, new { id = "checkoutForm" }))
                 {
+                    @Html.AntiForgeryToken()
+
                     <div class="mb-3">
                         <label class="form-label fw-bold">Họ và tên người nhận</label>
-                        <input type="text" name="CustomerName" class="form-control py-2" placeholder="Ví dụ: Nguyễn Văn A" required>
+                        <input type="text" name="CustomerName" class="form-control py-2 shadow-sm" placeholder="Ví dụ: Nguyễn Văn A" required>
                     </div>
+
                     <div class="mb-3">
                         <label class="form-label fw-bold">Số điện thoại</label>
-                        <input type="tel" name="Phone" class="form-control py-2" placeholder="09xxxxxxxx" required>
+                        <input type="tel" name="Phone" class="form-control py-2 shadow-sm"
+                               pattern="[0-9]{10,11}" title="Vui lòng nhập số điện thoại hợp lệ (10-11 số)"
+                               placeholder="09xxxxxxxx" required>
                     </div>
+
                     <div class="mb-3">
                         <label class="form-label fw-bold">Địa chỉ giao hàng (Bình Dương/TP.HCM...)</label>
-                        <textarea name="Address" class="form-control" rows="3" placeholder="Số nhà, tên đường, phường..." required></textarea>
+                        <textarea name="Address" class="form-control shadow-sm" rows="3" placeholder="Số nhà, tên đường, phường/xã..." required></textarea>
                     </div>
+
                     <div class="mb-4">
                         <label class="form-label fw-bold">Ghi chú thêm</label>
-                        <input type="text" name="Note" class="form-control" placeholder="Giao giờ hành chính, gọi trước khi đến...">
+                        <input type="text" name="Note" class="form-control py-2 shadow-sm" placeholder="Giao giờ hành chính, gọi trước khi đến...">
                     </div>
+
+                    @* Hiển thị tóm tắt tổng tiền *@
+                    <div class="d-flex justify-content-between align-items-center mb-4 p-3 bg-light rounded-3">
+                        <span class="fw-bold">Tổng thanh toán:</span>
+                        <span class="text-danger fw-bold fs-4">@totalAmount.ToString("N0") đ</span>
+                    </div>
+
                     <div class="d-grid">
-                        <button type="submit" class="btn btn-warning btn-lg text-white fw-bold py-3 shadow" style="border-radius: 15px;">XÁC NHẬN ĐẶT HÀNG</button>
+                        <button type="submit" class="btn btn-warning btn-lg text-white fw-bold py-3 shadow" style="border-radius: 15px;">
+                            XÁC NHẬN ĐẶT HÀNG <i class="fa-solid fa-check-circle ms-2"></i>
+                        </button>
+                        <a href="@Url.Action("Index", "Cart")" class="btn btn-link text-muted mt-2 text-decoration-none">
+                            <i class="fa-solid fa-arrow-left"></i> Quay lại giỏ hàng
+                        </a>
                     </div>
                 }
             </div>
         </div>
     </div>
 </div>
+
+@section scripts {
+    <script>
+        // Hiệu ứng khi bấm đặt hàng để tránh người dùng nhấn nhiều lần
+        $('#checkoutForm').submit(function () {
+            var btn = $(this).find('button[type="submit"]');
+            btn.prop('disabled', true);
+            btn.html('<i class="fa-solid fa-spinner fa-spin me-2"></i> ĐANG XỬ LÝ...');
+        });
+    </script>
+}

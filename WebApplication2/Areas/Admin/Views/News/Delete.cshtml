@@ -28,39 +28,38 @@
             </div>
 
             @* --- Phần thông tin --- *@
-            <div class="col-md-8">
-                <h3 class="fw-bold text-dark">@Model.Title</h3>
-                <p class="text-muted small">
-                    <i class="fa-regular fa-calendar me-2 text-danger"></i>Đăng ngày: @Model.CreatedDate.ToString("dd/MM/yyyy HH:mm")
-                </p>
-                <hr>
-                <div class="p-3 bg-light rounded-3 mb-4 border-start border-danger border-4">
-                    <p class="m-0 text-secondary">@Model.ShortDescription</p>
+        <div class="col-md-8">
+            <h3 class="fw-bold text-dark">@Model.Title</h3>
+            <p class="text-muted small">
+                <i class="fa-regular fa-calendar me-2 text-danger"></i>Đăng ngày: @Model.CreatedDate.ToString("dd/MM/yyyy HH:mm")
+            </p>
+            <hr>
+            <div class="p-3 bg-light rounded-3 mb-4 border-start border-danger border-4">
+                <p class="m-0 text-secondary">@Model.ShortDescription</p>
+            </div>
+
+            @* Sửa dòng BeginForm *@
+            @using (Html.BeginForm("Delete", "News", new { area = "Admin" }, FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(model => model.Id)
+
+                <div class="alert alert-warning border-0 rounded-3">
+                    <i class="fa-solid fa-triangle-exclamation me-2"></i>
+                    Hành động này không thể hoàn tác. Bạn có chắc chắn muốn xóa bài viết này?
                 </div>
 
-                @* --- FORM XÓA --- *@
-                @using (Html.BeginForm("Delete", "News", FormMethod.Post))
-                {
-                    @Html.AntiForgeryToken()
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-danger px-5 rounded-pill fw-bold shadow-sm">
+                        <i class="fa-solid fa-check me-2"></i>CÓ, XÁC NHẬN XÓA
+                    </button>
+                    <a href="@Url.Action("Index", "News", new { area = "Admin" })" class="btn btn-light px-4 rounded-pill border ms-2">
+                        Hủy bỏ
+                    </a>
+                </div>
+            }
 
-                    @* QUAN TRỌNG: Phải có dòng này thì Controller mới nhận được ID để xóa *@
-                    @Html.HiddenFor(model => model.Id)
-
-                    <div class="alert alert-warning border-0 rounded-3">
-                        <i class="fa-solid fa-triangle-exclamation me-2"></i>
-                        Hành động này không thể hoàn tác. Bạn có chắc chắn muốn xóa bài viết này?
-                    </div>
-
-                    <div class="mt-4">
-                        <button type="submit" class="btn btn-danger px-5 rounded-pill fw-bold shadow-sm">
-                            <i class="fa-solid fa-check me-2"></i>CÓ, XÁC NHẬN XÓA
-                        </button>
-                        <a href="@Url.Action("Index")" class="btn btn-light px-4 rounded-pill border ms-2">
-                            Hủy bỏ
-                        </a>
-                    </div>
-                }
-            </div>
+        </div>
         </div>
     </div>
 </div>

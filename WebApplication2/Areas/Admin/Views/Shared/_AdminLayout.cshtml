@@ -102,6 +102,39 @@
             padding: 15px 25px;
             font-weight: bold;
         }
+        .pagination-container {
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .pagination {
+            display: flex;
+            list-style: none;
+            border-radius: 0.75rem;
+            padding: 0;
+        }
+
+        .page-item .page-link {
+            border: none;
+            margin: 0 3px;
+            border-radius: 8px !important;
+            color: #4b5563;
+            background: #f3f4f6;
+            padding: 8px 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .page-item.active .page-link {
+            background: #ff8c00 !important; /* Màu cam thương hiệu */
+            color: white !important;
+            box-shadow: 0 4px 10px rgba(255, 140, 0, 0.3);
+        }
+
+        .page-item:hover .page-link:not(.active) {
+            background: #e5e7eb;
+            transform: translateY(-2px);
+        }
     </style>
 </head>
 <body>

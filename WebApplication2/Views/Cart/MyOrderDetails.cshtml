@@ -1,0 +1,76 @@
+﻿@model WebApplication2.Models.Order
+@{
+    ViewBag.Title = "Chi tiết đơn hàng #" + Model.Id;
+}
+
+<div class="container py-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="@Url.Action("MyOrders", "Cart")" class="text-decoration-none">Đơn hàng của tôi</a></li>
+            <li class="breadcrumb-item active">Chi tiết #@Model.Id</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        @* THÔNG TIN NHẬN HÀNG *@
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-3" style="color: #ff8c00;">THÔNG TIN NHẬN HÀNG</h5>
+                    <p class="mb-2"><strong>Người nhận:</strong> @Model.CustomerName</p>
+                    <p class="mb-2"><strong>Điện thoại:</strong> @Model.Phone</p>
+                    <p class="mb-2"><strong>Địa chỉ:</strong> @Model.Address</p>
+                    <p class="mb-2"><strong>Ghi chú:</strong> <i>@Model.Note</i></p>
+                    <hr>
+                    <p class="mb-0">
+                        <strong>Trạng thái:</strong>
+                        <span class="badge @(Model.Status == "Hoàn thành" ? "bg-success" : "bg-warning text-dark") rounded-pill">
+                            @Model.Status
+                        </span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        @* DANH SÁCH SẢN PHẨM *@
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4">Sản phẩm</th>
+                            <th class="text-center">Số lượng</th>
+                            <th class="text-end pe-4">Thành tiền</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.OrderDetails)
+                        {
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="d-flex align-items-center">
+                                        @if (!string.IsNullOrEmpty(item.Book.ImagePath))
+                                        {
+                                            <img src="@Url.Content(item.Book.ImagePath)" class="rounded-3 me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                                        }
+                                        <span class="fw-bold text-dark">@item.Book.Title</span>
+                                    </div>
+                                </td>
+                                <td class="text-center">x @item.Quantity</td>
+                                <td class="text-end pe-4 fw-bold">@((item.Quantity * item.UnitPrice).ToString("N0")) đ</td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot class="bg-light">
+                        <tr>
+                            <td colspan="2" class="text-end fw-bold py-3 fs-5">TỔNG CỘNG:</td>
+                            <td class="text-end pe-4 py-3 text-danger fw-bold fs-4">
+                                @Model.TotalAmount.ToString("N0") đ
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

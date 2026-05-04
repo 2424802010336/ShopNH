@@ -2,16 +2,20 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNet.Identity;
 using Microsoft.Owin.Security;
+using System;
 
 namespace WebApplication2.Models
 {
     public class IndexViewModel
     {
         public bool HasPassword { get; set; }
-        public IList<UserLoginInfo> Logins { get; set; }
+        public string Email { get; set; }
         public string PhoneNumber { get; set; }
+        public string Address { get; set; }
+        public DateTime? BirthDate { get; set; }
         public bool TwoFactor { get; set; }
         public bool BrowserRemembered { get; set; }
+        public IList<Microsoft.AspNet.Identity.UserLoginInfo> Logins { get; set; }
     }
 
     public class ManageLoginsViewModel

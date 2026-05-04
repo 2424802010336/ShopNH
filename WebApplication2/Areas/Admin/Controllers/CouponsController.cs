@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web.Mvc;
 using WebApplication2.Models;
 using System.Data.Entity;
+using PagedList;
 
 namespace WebApplication2.Areas.Admin.Controllers
 {
@@ -12,11 +13,29 @@ namespace WebApplication2.Areas.Admin.Controllers
     {
         private readonly ApplicationDbContext db = new ApplicationDbContext();
 
-        // 1. DANH SÁCH VOUCHER
-        public ActionResult Index()
+        // 1. DANH SÁCH VOUCHER (Tìm kiếm tuyệt đối & Phân trang)
+        public ActionResult Index(string searchString, int? page)
         {
-            var coupons = db.Coupons.OrderByDescending(c => c.ExpiryDate).ToList();
-            return View(coupons);
+            var coupons = db.Coupons.AsQueryable();
+
+            // Tìm kiếm theo mã Voucher
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                searchString = searchString.Trim();
+                // SỬA TẠI ĐÂY: Dùng == thay cho .Contains để tìm chính xác và ẩn các mã khác
+                coupons = coupons.Where(c => c.Code == searchString);
+            }
+
+            // Sắp xếp theo ngày hết hạn (mới nhất lên đầu)
+            var orderedList = coupons.OrderByDescending(c => c.ExpiryDate);
+
+            // Phân trang 10 bản ghi
+            int pageSize = 10;
+            int pageNumber = (page ?? 1);
+
+            ViewBag.CurrentFilter = searchString;
+
+            return View(orderedList.ToPagedList(pageNumber, pageSize));
         }
 
         // 2. TẠO MỚI VOUCHER
@@ -81,40 +100,70 @@ namespace WebApplication2.Areas.Admin.Controllers
             return RedirectToAction("Index");
         }
 
-        // 5. TRANG THIẾT LẬP ƯU ĐÃI (GỘP TỪ SALE)
-        public ActionResult ApplySale()
+        public ActionResult ApplySale(string searchString, string category, int? page)
         {
-            // Lấy danh sách Voucher còn hạn
+            // 1. Lấy danh sách Voucher cho Bước 1
             ViewBag.Coupons = db.Coupons.Where(c => c.IsActive && c.ExpiryDate >= DateTime.Now).ToList();
-            // Lấy danh sách sản phẩm
-            var products = db.Books.ToList();
-            return View(products);
+
+            var products = db.Books.AsQueryable();
+
+            // 2. Lọc theo tên sản phẩm (nếu có)
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                searchString = searchString.Trim();
+                products = products.Where(p => p.Title.Contains(searchString));
+                ViewBag.SearchString = searchString;
+            }
+
+            // 3. Lọc theo danh mục (nếu có)
+            if (!string.IsNullOrEmpty(category))
+            {
+                // Vì trường Category của bạn lưu dạng chuỗi (VotYonex, GiayLining...)
+                products = products.Where(p => p.Category.Contains(category));
+                ViewBag.CurrentCategory = category;
+            }
+
+            int pageSize = 10;
+            int pageNumber = (page ?? 1);
+
+            return View(products.OrderByDescending(x => x.Id).ToPagedList(pageNumber, pageSize));
         }
 
-        // 6. XỬ LÝ ÁP DỤNG SALE CHO NHIỀU SẢN PHẨM
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult ExecuteApplySale(int couponId, int[] selectedProductIds)
         {
             if (selectedProductIds == null || selectedProductIds.Length == 0)
             {
-                TempData["Error"] = "Vui lòng chọn ít nhất một sản phẩm!";
+                TempData["Error"] = "Vui lòng tích chọn ít nhất một sản phẩm!";
                 return RedirectToAction("ApplySale");
             }
 
-            // Logic: Tùy theo cấu trúc DB của bạn (ví dụ gán CouponId vào bảng Book)
-            foreach (var pId in selectedProductIds)
+            try
             {
-                var book = db.Books.Find(pId);
-                if (book != null)
+                var coupon = db.Coupons.Find(couponId);
+                if (coupon == null) return HttpNotFound();
+
+                foreach (var pId in selectedProductIds)
                 {
-                    // Ví dụ: book.CouponId = couponId;
-                    // Hoặc thêm vào bảng trung gian ProductCoupons nếu có
+                    var book = db.Books.Find(pId);
+                    if (book != null)
+                    {
+                        // Cập nhật giá khuyến mãi (SalePrice) dựa trên % giảm của Coupon
+                        // Lưu ý: Hậu hãy chắc chắn Model Book đã có cột SalePrice (kiểu decimal)
+                        book.SalePrice = book.Price - (book.Price * coupon.DiscountPercent / 100);
+                        db.Entry(book).State = EntityState.Modified;
+                    }
                 }
+
+                db.SaveChanges();
+                TempData["Success"] = "Đã áp dụng mã " + coupon.Code + " cho các sản phẩm thành công!";
             }
-            
-            db.SaveChanges();
-            TempData["Success"] = "Đã áp dụng mã giảm giá cho các sản phẩm đã chọn!";
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Lỗi hệ thống: " + ex.Message;
+            }
+
             return RedirectToAction("ApplySale");
         }
 

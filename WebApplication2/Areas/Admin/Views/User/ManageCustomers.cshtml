@@ -7,21 +7,25 @@
 
 <div class="container-fluid py-4">
     <div class="row mb-4 align-items-center">
-        <div class="col-md-6">
+        <div class="col-md-4">
             <h4 class="fw-bold m-0 text-dark">
                 <i class="fa-solid fa-users me-2 text-info"></i>THỐNG KÊ KHÁCH HÀNG
             </h4>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-8">
             @using (Html.BeginForm("ManageCustomers", "User", FormMethod.Get, new { @class = "d-flex justify-content-end gap-2" }))
             {
-                <select name="month" class="form-select shadow-none" style="width: 130px;">
+                <input type="text" name="searchString" value="@Request.QueryString["searchString"]"
+                       class="form-control shadow-none border-secondary" style="width: 220px;"
+                       placeholder="Tìm Email/Tên đăng nhập...">
+
+                <select name="month" class="form-select shadow-none" style="width: 110px;">
                     @for (int i = 1; i <= 12; i++)
                     {
                         <option value="@i" @(ViewBag.SelectedMonth == i ? "selected" : "")>Tháng @i</option>
                     }
                 </select>
-                <select name="year" class="form-select shadow-none" style="width: 130px;">
+                <select name="year" class="form-select shadow-none" style="width: 110px;">
                     @for (int i = DateTime.Now.Year; i >= 2020; i--)
                     {
                         <option value="@i" @(ViewBag.SelectedYear == i ? "selected" : "")>Năm @i</option>
@@ -34,6 +38,22 @@
         </div>
     </div>
 
+    @* HIỂN THỊ TỔNG DOANH THU HỆ THỐNG TRONG THÁNG *@
+    <div class="alert alert-info border-0 shadow-sm rounded-4 d-flex justify-content-between align-items-center p-3 mb-4 bg-white" style="border-left: 5px solid #0dcaf0 !important;">
+        <div class="d-flex align-items-center">
+            <div class="icon-box bg-info text-white rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
+                <i class="fa-solid fa-sack-dollar fs-5"></i>
+            </div>
+            <div>
+                <h6 class="m-0 fw-bold text-dark">Tổng chi tiêu hệ thống</h6>
+                <small class="text-muted">Tháng @ViewBag.SelectedMonth/@ViewBag.SelectedYear</small>
+            </div>
+        </div>
+        <div class="text-end">
+            <h4 class="m-0 fw-bold text-primary">@ViewBag.GrandTotal.ToString("N0") <small>đ</small></h4>
+        </div>
+    </div>
+
     <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
@@ -41,19 +61,14 @@
                     <tr>
                         <th class="ps-4 py-3">Khách hàng</th>
                         <th class="text-center">Số đơn hàng</th>
-                        <th class="text-end">Tổng chi tiêu (Tháng @ViewBag.SelectedMonth/@ViewBag.SelectedYear)</th>
+                        <th class="text-end">Tổng chi tiêu</th>
                         <th class="text-center">Hành động</th>
                     </tr>
                 </thead>
                 <tbody>
                     @if (Model.Count == 0)
                     {
-                        <tr>
-                            <td colspan="4" class="text-center py-5 text-muted">
-                                <i class="fa-solid fa-folder-open fa-2x d-block mb-2 opacity-25"></i>
-                                Không có dữ liệu mua hàng trong thời gian này.
-                            </td>
-                        </tr>
+                        <tr><td colspan="4" class="text-center py-5 text-muted">Không tìm thấy khách hàng.</td></tr>
                     }
                     else
                     {
@@ -73,8 +88,7 @@
                                 <td class="text-center">
                                     <a href="@Url.Action("ToggleLock", "User", new { id = item.UserId })"
                                        class="btn btn-sm btn-light border text-danger shadow-sm"
-                                       onclick="return confirm('Xác nhận thay đổi trạng thái khóa của tài khoản này?')"
-                                       title="Khóa / Mở khóa">
+                                       onclick="return confirm('Thay đổi trạng thái khóa tài khoản?')">
                                         <i class="fa-solid fa-user-slash"></i>
                                     </a>
                                 </td>
@@ -86,22 +100,16 @@
         </div>
     </div>
 
-    <!-- Phân trang -->
+    @* PHÂN TRANG *@
     <div class="pagination-container d-flex justify-content-center mt-5">
-        @Html.PagedListPager(Model, page => Url.Action("ManageCustomers", new { page, month = ViewBag.SelectedMonth, year = ViewBag.SelectedYear }),
-        new PagedListRenderOptions
+        @Html.PagedListPager(Model, page => Url.Action("ManageCustomers", new
         {
-            DisplayLinkToFirstPage = PagedListDisplayMode.Always,
-            DisplayLinkToLastPage = PagedListDisplayMode.Always,
-            DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
-            DisplayLinkToNextPage = PagedListDisplayMode.Always,
-            MaximumPageNumbersToDisplay = 5,
-            // Thay đổi icon cho nút bấm
-            LinkToFirstPageFormat = "<i class='fa-solid fa-angles-left'></i>",
-            LinkToPreviousPageFormat = "<i class='fa-solid fa-chevron-left'></i>",
-            LinkToNextPageFormat = "<i class='fa-solid fa-chevron-right'></i>",
-            LinkToLastPageFormat = "<i class='fa-solid fa-angles-right'></i>",
-            // Gán class Bootstrap
+            page,
+            month = ViewBag.SelectedMonth,
+            year = ViewBag.SelectedYear,
+            searchString = Request.QueryString["searchString"]
+        }), new PagedListRenderOptions
+        {
             UlElementClasses = new[] { "pagination", "custom-pagination" },
             LiElementClasses = new[] { "page-item" }
         })
@@ -109,6 +117,7 @@
 </div>
 
 <style>
+    /* CSS đồng nhất style phân trang của bạn */
     .page-item .page-link {
         color: #2c3e50;
         padding: 8px 16px;
@@ -121,40 +130,30 @@
         color: white;
     }
 
-    .table thead th {
-        font-weight: 600;
-        border: none;
-    }
-
     .custom-pagination .page-item {
         margin: 0 4px;
     }
 
-    .custom-pagination .page-link,
-    .custom-pagination .page-item span {
-        border: none;
-        border-radius: 12px !important;
-        color: #4b5563;
-        padding: 10px 18px;
-        font-weight: 600;
-        background-color: #f3f4f6;
-        transition: all 0.3s ease;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    }
+        .custom-pagination .page-link, .custom-pagination .page-item span {
+            border: none;
+            border-radius: 12px !important;
+            color: #4b5563;
+            padding: 10px 18px;
+            font-weight: 600;
+            background-color: #f3f4f6;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            text-decoration: none;
+        }
 
-    .custom-pagination .page-item.active span,
-    .custom-pagination .page-item.active .page-link {
-        background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%) !important;
-        color: white !important;
-        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
-    }
+        .custom-pagination .page-item.active span, .custom-pagination .page-item.active .page-link {
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%) !important;
+            color: white !important;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+        }
 
-    .custom-pagination .page-item:hover .page-link {
-        background-color: #e5e7eb;
-        transform: translateY(-2px);
-    }
-
-    .PagedList-ellipses {
-        display: none;
-    }
+        .custom-pagination .page-item:hover .page-link {
+            background-color: #e5e7eb;
+            transform: translateY(-2px);
+        }
 </style>

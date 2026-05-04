@@ -11,6 +11,9 @@ using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using WebApplication2.Models;
+// --- THÊM 2 DÒNG NÀY ĐỂ FIX LỖI CS0246 ---
+using System.Net;
+using System.Net.Mail;
 
 namespace WebApplication2
 {
@@ -18,8 +21,34 @@ namespace WebApplication2
     {
         public Task SendAsync(IdentityMessage message)
         {
-            // Plug in your email service here to send an email.
-            return Task.FromResult(0);
+            try
+            {
+                // CẤU HÌNH GMAIL TẠI ĐÂY
+                var fromEmail = "2424802010336@student.tdmu.edu.vn";
+                var appPassword = "dvca eiqj fbco xisl"; // Mật khẩu ứng dụng 16 ký tự của Google
+
+                var mail = new MailMessage();
+                mail.To.Add(message.Destination);
+                mail.From = new MailAddress(fromEmail, "SHOP NH SECURITY");
+                mail.Subject = message.Subject;
+                mail.Body = message.Body;
+                mail.IsBodyHtml = true;
+
+                var smtp = new SmtpClient("smtp.gmail.com", 587)
+                {
+                    EnableSsl = true,
+                    DeliveryMethod = SmtpDeliveryMethod.Network,
+                    UseDefaultCredentials = false,
+                    Credentials = new NetworkCredential(fromEmail, appPassword)
+                };
+
+                return smtp.SendMailAsync(mail);
+            }
+            catch (Exception)
+            {
+                // Ghi log lỗi nếu cần thiết
+                return Task.FromResult(0);
+            }
         }
     }
 
@@ -27,12 +56,11 @@ namespace WebApplication2
     {
         public Task SendAsync(IdentityMessage message)
         {
-            // Plug in your SMS service here to send a text message.
+            // Nếu không dùng SMS thì để trống như vậy là đúng
             return Task.FromResult(0);
         }
     }
 
-    // Configure the application user manager used in this application. UserManager is defined in ASP.NET Identity and is used by the application.
     public class ApplicationUserManager : UserManager<ApplicationUser>
     {
         public ApplicationUserManager(IUserStore<ApplicationUser> store)
@@ -40,17 +68,18 @@ namespace WebApplication2
         {
         }
 
-        public static ApplicationUserManager Create(IdentityFactoryOptions<ApplicationUserManager> options, IOwinContext context) 
+        public static ApplicationUserManager Create(IdentityFactoryOptions<ApplicationUserManager> options, IOwinContext context)
         {
             var manager = new ApplicationUserManager(new UserStore<ApplicationUser>(context.Get<ApplicationDbContext>()));
-            // Configure validation logic for usernames
+
+            // Cấu hình tên đăng nhập
             manager.UserValidator = new UserValidator<ApplicationUser>(manager)
             {
                 AllowOnlyAlphanumericUserNames = false,
                 RequireUniqueEmail = true
             };
 
-            // Configure validation logic for passwords
+            // Cấu hình mật khẩu
             manager.PasswordValidator = new PasswordValidator
             {
                 RequiredLength = 6,
@@ -60,35 +89,35 @@ namespace WebApplication2
                 RequireUppercase = true,
             };
 
-            // Configure user lockout defaults
+            // Cấu hình khóa tài khoản
             manager.UserLockoutEnabledByDefault = true;
             manager.DefaultAccountLockoutTimeSpan = TimeSpan.FromMinutes(5);
             manager.MaxFailedAccessAttemptsBeforeLockout = 5;
 
-            // Register two factor authentication providers. This application uses Phone and Emails as a step of receiving a code for verifying the user
-            // You can write your own provider and plug it in here.
+            // Đăng ký xác thực 2 lớp qua SĐT và Email
             manager.RegisterTwoFactorProvider("Phone Code", new PhoneNumberTokenProvider<ApplicationUser>
             {
-                MessageFormat = "Your security code is {0}"
+                MessageFormat = "Mã xác thực của bạn là {0}"
             });
             manager.RegisterTwoFactorProvider("Email Code", new EmailTokenProvider<ApplicationUser>
             {
-                Subject = "Security Code",
-                BodyFormat = "Your security code is {0}"
+                Subject = "Mã xác thực SHOP NH",
+                BodyFormat = "Mã xác thực của bạn là {0}"
             });
+
             manager.EmailService = new EmailService();
             manager.SmsService = new SmsService();
+
             var dataProtectionProvider = options.DataProtectionProvider;
             if (dataProtectionProvider != null)
             {
-                manager.UserTokenProvider = 
+                manager.UserTokenProvider =
                     new DataProtectorTokenProvider<ApplicationUser>(dataProtectionProvider.Create("ASP.NET Identity"));
             }
             return manager;
         }
     }
 
-    // Configure the application sign-in manager which is used in this application.
     public class ApplicationSignInManager : SignInManager<ApplicationUser, string>
     {
         public ApplicationSignInManager(ApplicationUserManager userManager, IAuthenticationManager authenticationManager)

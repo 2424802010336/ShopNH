@@ -1,78 +1,145 @@
-﻿@model IEnumerable<WebApplication2.Models.Book>
+﻿@using PagedList.Mvc;
+@model PagedList.IPagedList<WebApplication2.Models.Book>
 @{
     ViewBag.Title = "Thiết lập ưu đãi";
     Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
-    var coupons = ViewBag.Coupons as List<WebApplication2.Models.Coupon> ?? new List<WebApplication2.Models.Coupon>();
 }
 
-<div class="container-fluid py-4 text-dark">
+<div class="container-fluid py-4">
     <h2 class="fw-bold mb-4 text-dark"><i class="fa-solid fa-tags me-2 text-danger"></i>THIẾT LẬP ƯU ĐÃI</h2>
 
-    @using (Html.BeginForm("ExecuteApplySale", "Coupons", FormMethod.Post))
+    @* Form gửi dữ liệu sang hàm ExecuteApplySale để lưu vào DB *@
+    @using (Html.BeginForm("ExecuteApplySale", "Coupons", FormMethod.Post, new { id = "applySaleForm" }))
     {
         @Html.AntiForgeryToken()
         <div class="row">
+            @* CỘT BÊN TRÁI: BƯỚC 1 - CHỌN MÃ *@
             <div class="col-md-4">
-                <div class="card p-4 rounded-4 shadow border-0 bg-white mb-4 text-center">
-                    <h5 class="fw-bold text-dark mb-3 text-start">BƯỚC 1: CHỌN MÃ</h5>
-                    <select name="couponId" id="couponSelect" class="form-select form-select-lg mb-3 shadow-none border-primary" required>
+                <div class="card p-4 rounded-4 shadow-sm border-0 bg-white mb-4">
+                    <h5 class="fw-bold mb-3 text-dark">BƯỚC 1: CHỌN MÃ</h5>
+                    <select name="couponId" id="couponSelect" class="form-select mb-3 border-primary shadow-none" required>
                         <option value="">-- Chọn Voucher --</option>
-                        @foreach (var cp in (ViewBag.Coupons as List<WebApplication2.Models.Coupon>))
+                        @if (ViewBag.Coupons != null)
                         {
-                            <option value="@cp.Id">@cp.Code (-@cp.DiscountPercent%)</option>
-}
+                            foreach (var cp in (ViewBag.Coupons as List<WebApplication2.Models.Coupon>))
+                            {
+                                <option value="@cp.Id">@cp.Code (-@cp.DiscountPercent%)</option>
+                            }
+                        }
                     </select>
 
-                    @* Nút Xác nhận áp dụng *@
                     <button type="submit" id="btnConfirm" class="btn btn-danger btn-lg w-100 rounded-pill shadow fw-bold mb-2" disabled>
                         XÁC NHẬN ÁP DỤNG
                     </button>
 
-                    @* NÚT QUAY LẠI TRANG VOUCHER *@
                     <a href="@Url.Action("Index", "Coupons")" class="btn btn-outline-secondary w-100 rounded-pill fw-bold">
                         <i class="fa-solid fa-rotate-left me-2"></i> QUAY LẠI VOUCHER
                     </a>
                 </div>
             </div>
 
+            @* CỘT BÊN PHẢI: BƯỚC 2 - CHỌN SẢN PHẨM *@
             <div class="col-md-8">
-                <div class="card rounded-4 shadow border-0 overflow-hidden bg-white">
-                    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                @* THANH TÌM KIẾM *@
+                <div class="input-group mb-2 shadow-sm rounded-pill overflow-hidden border">
+                    <input type="text" id="searchInput" class="form-control border-0 ps-4 bg-white"
+                           placeholder="Nhập tên sản phẩm cần tìm..." value="@ViewBag.SearchString">
+                    <button class="btn btn-dark px-4" type="button" onclick="executeSearch()">
+                        <i class="fa-solid fa-magnifying-glass me-2"></i>Tìm kiếm
+                    </button>
+                </div>
+
+                @* BỘ LỌC DANH MỤC NHANH *@
+                <div class="mb-3 d-flex flex-wrap gap-2 ps-2">
+                    <span class="text-muted small fw-bold mt-1">Lọc nhanh:</span>
+                    <a href="@Url.Action("ApplySale", new { searchString = ViewBag.SearchString })"
+                       class="badge rounded-pill border text-decoration-none @(string.IsNullOrEmpty(ViewBag.CurrentCategory) ? "bg-dark text-white" : "bg-light text-dark")">Tất cả</a>
+
+                    <a href="@Url.Action("ApplySale", new { category = "Vot", searchString = ViewBag.SearchString })"
+                       class="badge rounded-pill border text-decoration-none @(ViewBag.CurrentCategory == "Vot" ? "bg-primary text-white" : "bg-light text-dark")">Vợt cầu lông</a>
+
+                    <a href="@Url.Action("ApplySale", new { category = "Giay", searchString = ViewBag.SearchString })"
+                       class="badge rounded-pill border text-decoration-none @(ViewBag.CurrentCategory == "Giay" ? "bg-primary text-white" : "bg-light text-dark")">Giày</a>
+
+                    <a href="@Url.Action("ApplySale", new { category = "Ao", searchString = ViewBag.SearchString })"
+                       class="badge rounded-pill border text-decoration-none @(ViewBag.CurrentCategory == "Ao" ? "bg-primary text-white" : "bg-light text-dark")">Áo quần</a>
+
+                    <a href="@Url.Action("ApplySale", new { category = "PhuKien", searchString = ViewBag.SearchString })"
+                       class="badge rounded-pill border text-decoration-none @(ViewBag.CurrentCategory == "PhuKien" ? "bg-primary text-white" : "bg-light text-dark")">Phụ kiện</a>
+                </div>
+
+                <div class="card rounded-4 shadow-sm border-0 overflow-hidden bg-white">
+                    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-3">
                         <h5 class="m-0 fw-bold">BƯỚC 2: CHỌN SẢN PHẨM</h5>
                         <div class="form-check m-0">
                             <input type="checkbox" id="checkAll" class="form-check-input">
-                            <label class="form-check-label text-white" for="checkAll">Tất cả</label>
+                            <label class="form-check-label text-white fw-bold" for="checkAll">Tất cả</label>
                         </div>
                     </div>
-                    <div class="table-responsive" style="max-height: 500px;">
+                    <div class="table-responsive">
                         <table class="table table-hover align-middle mb-0">
-                            <thead>
+                            <thead class="table-light">
                                 <tr>
                                     <th class="text-center" width="80">Chọn</th>
                                     <th>Sản phẩm</th>
-                                    <th class="text-end">Giá bán</th>
+                                    <th class="text-end pe-4">Giá bán</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach (var item in Model)
+                                @if (Model != null && Model.Any())
                                 {
-                                    <tr>
-                                        <td class="text-center">
-                                            <input type="checkbox" name="selectedProductIds" value="@item.Id" class="product-check form-check-input">
-                                        </td>
-                                        <td>
-                                            <div class="fw-bold text-dark">@item.Title</div>
-                                            <small class="text-muted">
-                                                @* Vì Category trong Book.cs là string nên hiển thị trực tiếp *@
-                                                @(string.IsNullOrEmpty(item.Category) ? "Chưa phân loại" : item.Category)
-                                            </small>
-                                        </td>
-                                        <td class="text-end pe-4 fw-bold text-danger">@item.Price.ToString("N0") đ</td>
-                                    </tr>
-}
+                                    foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            <td class="text-center">
+                                                <input type="checkbox" name="selectedProductIds" value="@item.Id" class="product-check form-check-input">
+                                            </td>
+                                            <td>
+                                                <div class="fw-bold text-dark">@item.Title</div>
+                                                <div class="d-flex flex-wrap gap-1 align-items-center">
+                                                    <small class="text-muted me-2">@item.Category</small>
+
+                                                    @* Badge hiển thị voucher đang có *@
+                                                    @if (item.SalePrice.HasValue && item.SalePrice < item.Price)
+                                                    {
+                                                        var discount = Math.Round((double)(100 - (item.SalePrice / item.Price * 100)));
+                                                        <span class="badge bg-success-subtle text-success border border-success-subtle" style="font-size: 0.7rem;">
+                                                            <i class="fa-solid fa-check-circle me-1"></i> Đang giảm @discount%
+                                                        </span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge bg-light text-muted border" style="font-size: 0.7rem;">
+                                                            Chưa có ưu đãi
+                                                        </span>
+                                                    }
+                                                </div>
+                                            </td>
+                                            <td class="text-end pe-4 fw-bold text-danger">@item.Price.ToString("N0") đ</td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr><td colspan="3" class="text-center py-5 text-muted">Không tìm thấy sản phẩm nào phù hợp.</td></tr>
+                                }
                             </tbody>
                         </table>
                     </div>
+                </div>
+
+                @* PHÂN TRANG *@
+                <div class="d-flex justify-content-center mt-4">
+                    @Html.PagedListPager(Model, page => Url.Action("ApplySale", new
+                    {
+                        page,
+                        searchString = ViewBag.SearchString,
+                        category = ViewBag.CurrentCategory
+                    }), new PagedListRenderOptions
+                    {
+                        LiElementClasses = new string[] { "page-item" },
+                        UlElementClasses = new string[] { "pagination shadow-sm" }
+                    })
                 </div>
             </div>
         </div>
@@ -81,21 +148,45 @@
 
 @section scripts {
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const btnConfirm = document.getElementById("btnConfirm");
-            const couponSelect = document.getElementById("couponSelect");
-            const checkboxes = document.querySelectorAll('input[name="selectedProductIds"]');
+        // Hàm xử lý tìm kiếm (giữ nguyên category đang lọc)
+        function executeSearch() {
+            const name = document.getElementById("searchInput").value;
+            const cat = '@(ViewBag.CurrentCategory ?? "")';
 
-            function checkForm() {
-                let isProductSelected = Array.from(checkboxes).some(c => c.checked);
-                let isCouponSelected = couponSelect.value !== "";
-
-                // Chỉ bật nút khi đã chọn cả 2
-                btnConfirm.disabled = !(isProductSelected && isCouponSelected);
+            let url = '@Url.Action("ApplySale", "Coupons")' + '?searchString=' + encodeURIComponent(name);
+            if(cat) {
+                url += '&category=' + encodeURIComponent(cat);
             }
 
-            couponSelect.addEventListener("change", checkForm);
-            checkboxes.forEach(c => c.addEventListener("change", checkForm));
+            window.location.href = url;
+        }
+
+        $(document).ready(function () {
+            // 1. Logic Check All
+            $('#checkAll').on('click', function () {
+                $('.product-check').prop('checked', this.checked);
+                validateForm();
+            });
+
+            // 2. Logic bật/tắt nút áp dụng
+            function validateForm() {
+                const hasProduct = $('.product-check:checked').length > 0;
+                const hasCoupon = $('#couponSelect').val() !== "";
+                $('#btnConfirm').prop('disabled', !(hasProduct && hasCoupon));
+            }
+
+            // Gắn sự kiện thay đổi cho select và checkbox
+            $(document).on('change', '#couponSelect, .product-check', function() {
+                validateForm();
+            });
+
+            // Hỗ trợ nhấn phím Enter để tìm kiếm
+            $('#searchInput').on('keypress', function (e) {
+                if (e.which === 13) {
+                    e.preventDefault();
+                    executeSearch();
+                }
+            });
         });
     </script>
 }

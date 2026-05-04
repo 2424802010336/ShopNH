@@ -14,11 +14,10 @@ namespace WebApplication2
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
             routes.MapRoute(
-            name: "Default",
-            url: "{controller}/{action}/{id}",
-            defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional },
-            // THÊM DÒNG NÀY ĐỂ CHỈ ĐỊNH NAMESPACE MẶC ĐỊNH
-            namespaces: new[] { "WebApplication2.Controllers" }
+                name: "Default",
+                url: "{controller}/{action}/{id}",
+                defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional },
+                namespaces: new[] { "WebApplication2.Controllers" } // Thêm dòng này để chỉ định namespace ngoài Client
             );
         }
     }

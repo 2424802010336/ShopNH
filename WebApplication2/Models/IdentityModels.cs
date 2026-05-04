@@ -16,6 +16,9 @@ namespace WebApplication2.Models
 
         // Thuộc tính khóa tài khoản thủ công (Nếu bạn dùng IsLocked thay vì LockoutEndDateUtc)
         public bool IsLocked { get; set; }
+        public string FullName { get; set; }
+        public string Address { get; set; }
+        public DateTime? BirthDate { get; set; }
 
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
         {

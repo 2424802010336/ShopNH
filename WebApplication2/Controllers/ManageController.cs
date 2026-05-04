@@ -54,25 +54,91 @@ namespace WebApplication2.Controllers
         // GET: /Manage/Index
         public async Task<ActionResult> Index(ManageMessageId? message)
         {
-            ViewBag.StatusMessage =
-                message == ManageMessageId.ChangePasswordSuccess ? "Your password has been changed."
-                : message == ManageMessageId.SetPasswordSuccess ? "Your password has been set."
-                : message == ManageMessageId.SetTwoFactorSuccess ? "Your two-factor authentication provider has been set."
-                : message == ManageMessageId.Error ? "An error has occurred."
-                : message == ManageMessageId.AddPhoneSuccess ? "Your phone number was added."
-                : message == ManageMessageId.RemovePhoneSuccess ? "Your phone number was removed."
-                : "";
-
             var userId = User.Identity.GetUserId();
+            var user = await UserManager.FindByIdAsync(userId);
+
+            // FIX LỖI NULL TẠI ĐÂY: Nếu không tìm thấy user, chuyển về trang đăng nhập
+            if (user == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
             var model = new IndexViewModel
             {
-                HasPassword = HasPassword(),
-                PhoneNumber = await UserManager.GetPhoneNumberAsync(userId),
-                TwoFactor = await UserManager.GetTwoFactorEnabledAsync(userId),
-                Logins = await UserManager.GetLoginsAsync(userId),
-                BrowserRemembered = await AuthenticationManager.TwoFactorBrowserRememberedAsync(userId)
+                HasPassword = user.PasswordHash != null,
+                PhoneNumber = user.PhoneNumber,
+                Email = user.Email,
+                Address = user.Address,
+                BirthDate = user.BirthDate,
+                TwoFactor = user.TwoFactorEnabled,
+                Logins = await UserManager.GetLoginsAsync(userId)
             };
+
+            ViewBag.StatusMessage = TempData["StatusMessage"];
             return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> UpdateProfile(string address, DateTime? birthDate)
+        {
+            var userId = User.Identity.GetUserId();
+            var user = await UserManager.FindByIdAsync(userId);
+
+            user.Address = address;
+            user.BirthDate = birthDate;
+
+            var result = await UserManager.UpdateAsync(user);
+            if (result.Succeeded)
+            {
+                TempData["StatusMessage"] = "Cập nhật hồ sơ thành công!";
+            }
+            return RedirectToAction("Index");
+        }
+
+        // Gửi mã OTP
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> SendPasswordOTP()
+        {
+            var userId = User.Identity.GetUserId();
+            var user = await UserManager.FindByIdAsync(userId);
+
+            // Tạo mã 6 số
+            string code = new Random().Next(100000, 999999).ToString();
+            Session["PasswordOTP"] = code;
+
+            await UserManager.SendEmailAsync(userId, "Mã OTP SHOP NH", "Mã của bạn là: " + code);
+            return RedirectToAction("VerifyPasswordOTP", new { email = user.Email });
+        }
+
+        // 1. Hàm GET: Dùng để hiển thị giao diện nhập mã (khi vừa chuyển trang qua)
+        [HttpGet]
+        public ActionResult VerifyPasswordOTP(string email)
+        {
+            ViewBag.Email = email;
+            return View();
+        }
+
+        // 2. Hàm POST: Dùng để xử lý dữ liệu khi người dùng nhấn nút "XÁC NHẬN"
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult VerifyPasswordOTP(string otpInput, string email)
+        {
+            // Lấy mã OTP đã lưu trong Session lúc gửi mail
+            string sessionOtp = Session["PasswordOTP"] as string;
+
+            if (!string.IsNullOrEmpty(otpInput) && otpInput == sessionOtp)
+            {
+                // Nếu khớp mã, cho phép vào trang đổi mật khẩu
+                Session["IsOtpVerified"] = true;
+                return RedirectToAction("ChangePassword");
+            }
+
+            // Nếu sai mã, thông báo lỗi ra màn hình
+            ModelState.AddModelError("", "Mã OTP không chính xác hoặc đã hết hạn.");
+            ViewBag.Email = email;
+            return View();
         }
 
         //

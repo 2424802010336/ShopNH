@@ -1,24 +1,44 @@
-﻿@model IEnumerable<WebApplication2.Models.Order>
+﻿@using PagedList.Mvc;
+@model PagedList.IPagedList<WebApplication2.Models.Order>
 @{
     ViewBag.Title = "Quản lý đơn hàng";
     Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
 }
 
-<div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4 p-4 rounded-4 shadow-sm" style="background: #1e293b; border-left: 6px solid #38bdf8;">
-        <h3 class="fw-bold text-white m-0">
-            <i class="fa-solid fa-shopping-bag text-info me-2"></i> QUẢN LÝ ĐƠN HÀNG
-        </h3>
-        <span class="badge bg-info text-dark px-4 py-2 rounded-pill">Tổng số: @Model.Count() đơn</span>
+<div class="container-fluid py-4">
+    @* --- Header thon gọn và ĐÃ THÊM LẠI TỔNG SỐ ĐƠN --- *@
+    <div class="d-flex justify-content-between align-items-center mb-4 p-3 rounded-4 shadow-sm" style="background: #1e293b; border-left: 6px solid #38bdf8;">
+        <div class="d-flex align-items-center">
+            <h4 class="fw-bold text-white m-0 me-3">
+                <i class="fa-solid fa-shopping-bag text-info me-2"></i> ĐƠN HÀNG
+            </h4>
+            @* Hiển thị tổng số đơn hàng hiện có *@
+            <span class="badge bg-info text-dark px-3 py-2 rounded-pill fw-bold">
+                Tổng cộng: @Model.TotalItemCount đơn
+            </span>
+        </div>
+
+        @using (Html.BeginForm("Index", "Order", FormMethod.Get, new { @class = "d-flex", style = "width: 400px;" }))
+        {
+            <div class="input-group">
+                <input type="text" name="searchString" value="@ViewBag.CurrentFilter"
+                       class="form-control rounded-pill-start border-0 ps-3 bg-light"
+                       placeholder="Nhập mã đơn hàng">
+                <button type="submit" class="btn btn-info rounded-pill-end text-white px-3 shadow-sm">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
+            </div>
+        }
     </div>
 
     <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
-                <thead style="background: #f1f5f9;">
+                <thead class="bg-light">
                     <tr>
-                        <th class="ps-4">Mã ĐH</th>
+                        <th class="ps-4" style="width: 100px;">Mã ĐH</th>
                         <th>Khách hàng</th>
+                        <th>Số điện thoại</th>
                         <th>Ngày đặt</th>
                         <th>Tổng tiền</th>
                         <th class="text-center">Trạng thái</th>
@@ -26,23 +46,52 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var item in Model)
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="ps-4 fw-bold text-secondary">#@item.Id</td>
+                                <td>
+                                    <div class="fw-bold text-primary">@item.CustomerName</div>
+                                    <small class="text-muted d-block text-truncate" style="max-width: 200px;">@item.Address</small>
+                                </td>
+                                <td>@item.Phone</td>
+                                <td class="small">@item.OrderDate.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td><span class="text-danger fw-bold">@item.TotalAmount.ToString("N0") đ</span></td>
+                                <td class="text-center">
+                                    @if (item.Status == "Hoàn thành" || item.Status == "Đã giao")
+                                    {
+                                        <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill border border-success-subtle">Đã giao</span>
+                                    }
+                                    @* SỬA MÀU CHỜ DUYỆT TẠI ĐÂY: Dùng màu vàng cam đậm cho dễ nhìn *@
+                                    else if (item.Status == "Chờ duyệt")
+                                    {
+                                        <span class="badge bg-warning text-dark px-3 py-2 rounded-pill shadow-sm">Chờ duyệt</span>
+                                    }
+                                    else if (item.Status == "Đã hủy")
+                                    {
+                                        <span class="badge bg-danger-subtle text-danger px-3 py-2 rounded-pill border border-danger-subtle">Đã hủy</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary-subtle text-secondary px-3 py-2 rounded-pill border border-secondary-subtle">@item.Status</span>
+                                    }
+                                </td>
+                                <td class="text-center">
+                                    <a href="@Url.Action("Details", "Order", new { area = "Admin", id = item.Id })"
+                                       class="btn btn-sm btn-info text-white rounded-pill px-3 shadow-sm">
+                                        Chi tiết
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
                     {
                         <tr>
-                            <td class="ps-4 fw-bold text-secondary">#@item.Id</td>
-                            <td><div class="fw-bold">@item.CustomerName</div></td>
-                            <td>@item.OrderDate.ToString("dd/MM/yyyy HH:mm")</td>
-                            <td><span class="text-danger fw-bold">@String.Format("{0:0,0}", item.TotalAmount) đ</span></td>
-                            <td class="text-center">
-                                @if (item.Status == "Hoàn thành")
-                                {<span class="badge bg-success">Đã giao</span> }
-                                else
-                                { <span class="badge bg-warning text-dark">Chờ duyệt</span>}
-                            </td>
-                            <td class="text-center">
-                                <a href="@Url.Action("Details", "Order", new { area = "Admin", id = item.Id })" class="btn btn-sm btn-info text-white rounded-pill px-3">
-                                    <i class="fa-solid fa-eye me-1"></i>Chi tiết
-                                </a>
+                            <td colspan="7" class="text-center py-5 text-muted">
+                                Không tìm thấy đơn hàng nào phù hợp.
                             </td>
                         </tr>
                     }
@@ -50,4 +99,47 @@
             </table>
         </div>
     </div>
+
+    @* --- Phân trang --- *@
+    <div class="pagination-container d-flex justify-content-center mt-4">
+        @Html.PagedListPager(Model, page => Url.Action("Index", new
+        {
+            page,
+            searchString = ViewBag.CurrentFilter
+        }), new PagedListRenderOptions
+        {
+            LiElementClasses = new string[] { "page-item" },
+            UlElementClasses = new string[] { "pagination shadow-sm" }
+        })
+    </div>
 </div>
+
+<style>
+    /* CSS đồng nhất style phân trang */
+    .rounded-pill-start {
+        border-top-left-radius: 50rem !important;
+        border-bottom-left-radius: 50rem !important;
+    }
+
+    .rounded-pill-end {
+        border-top-right-radius: 50rem !important;
+        border-bottom-right-radius: 50rem !important;
+    }
+
+    .pagination .page-item .page-link {
+        color: #4b5563;
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        margin: 0 2px;
+        padding: 8px 16px;
+        font-weight: 600;
+        border-radius: 8px;
+        text-decoration: none;
+    }
+
+    .pagination .page-item.active .page-link {
+        background-color: #38bdf8 !important;
+        border-color: #38bdf8 !important;
+        color: white;
+    }
+</style>

@@ -336,7 +336,7 @@
                             </div>
                         </div>
                     </li>
-                    <li class="nav-item"><a class="nav-link" href="@Url.Action("News", "Home")"><i class="fa-solid fa-newspaper"></i> Tin tức</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("Index", "News")"><i class="fa-solid fa-newspaper"></i> Tin tức</a></li>
                     <li class="nav-item"><a class="nav-link" href="@Url.Action("Contact", "Home")"><i class="fa-solid fa-phone"></i> Liên hệ</a></li>
                     @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
                     {

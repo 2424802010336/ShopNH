@@ -1,42 +1,157 @@
 ﻿@model WebApplication2.Models.IndexViewModel
-@{ ViewBag.Title = "Hồ sơ cá nhân"; }
+@{
+    ViewBag.Title = "Hồ sơ cá nhân";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
 
-<div class="container py-4">
-    <h2 class="fw-bold" style="color: #ff8c00;"><i class="fa-solid fa-user-gear"></i> QUẢN LÝ TÀI KHOẢN</h2>
-    <p class="text-success">@ViewBag.StatusMessage</p>
+<div class="container py-5">
+    <div class="row">
+        @* Cột 1: Thông tin tóm tắt *@
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow-sm border-0 rounded-4 text-center p-4 bg-white h-100">
+                <div class="position-relative d-inline-block mx-auto mb-3">
+                    <div class="avatar-xl bg-primary-subtle rounded-circle d-flex align-items-center justify-content-center" style="width: 120px; height: 120px; background-color: #fef3c7;">
+                        <i class="fa-solid fa-user-ninja fs-1" style="color: #ff8c00;"></i>
+                    </div>
+                    <a href="#" class="position-absolute bottom-0 end-0 bg-white shadow-sm rounded-circle p-2 text-dark" title="Đổi ảnh đại diện">
+                        <i class="fa-solid fa-camera small"></i>
+                    </a>
+                </div>
+                <h4 class="fw-bold">@User.Identity.Name</h4>
+                <p class="text-muted small">Thành viên từ: @DateTime.Now.ToString("MM/yyyy")</p>
 
-    <div class="card shadow-sm border-0" style="border-radius: 20px;">
-        <div class="card-body p-4">
-            <h4 class="fw-bold mb-4">Cài đặt bảo mật</h4>
-            <hr />
-            <div class="row mb-3">
-                <div class="col-md-3 fw-bold text-muted"><i class="fa-solid fa-key"></i> Mật khẩu:</div>
-                <div class="col-md-9">
-                    @if (Model.HasPassword)
-                    {
-                        @Html.ActionLink("Đổi mật khẩu", "ChangePassword", null, new { @class = "btn btn-sm btn-outline-warning" })
-                    }
-                    else
-                    {
-                        @Html.ActionLink("Tạo mật khẩu", "SetPassword", null, new { @class = "btn btn-sm btn-warning" })
-                    }
+                <div class="mt-4 pt-3 border-top text-start">
+                    <p class="mb-2 text-truncate"><strong><i class="fa-solid fa-envelope me-2 text-muted"></i> Email:</strong> <span class="text-dark">@Model.Email</span></p>
+                    <p class="mb-0"><strong><i class="fa-solid fa-phone me-2 text-muted"></i> SĐT:</strong> <span class="text-dark">@(Model.PhoneNumber ?? "Chưa liên kết")</span></p>
                 </div>
             </div>
+        </div>
 
-            <div class="row mb-3">
-                <div class="col-md-3 fw-bold text-muted"><i class="fa-solid fa-phone"></i> Số điện thoại:</div>
-                <div class="col-md-9">
-                    @(Model.PhoneNumber ?? "Chưa cập nhật")
-                    @Html.ActionLink(Model.PhoneNumber != null ? "Thay đổi" : "Thêm mới", "AddPhoneNumber", null, new { @class = "btn btn-sm btn-link text-orange", style = "color: #ff8c00;" })
+        @* Cột 2: Cài đặt chi tiết *@
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0 rounded-4 bg-white overflow-hidden h-100">
+                <div class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold m-0" style="color: #ff8c00;"><i class="fa-solid fa-id-card me-2"></i> THÔNG TIN TÀI KHOẢN</h5>
+                    <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">Đang hoạt động</span>
                 </div>
-            </div>
 
-            <div class="row mb-3">
-                <div class="col-md-3 fw-bold text-muted"><i class="fa-solid fa-shield-halved"></i> Xác thực 2 lớp:</div>
-                <div class="col-md-9 text-muted small">
-                    Tính năng này đang được bảo trì.
+                <div class="card-body p-4">
+                    @if (TempData["StatusMessage"] != null)
+                    {
+                        <div class="alert alert-success border-0 shadow-sm rounded-3">@TempData["StatusMessage"]</div>
+                    }
+
+                    @* --- PHẦN 1: THÔNG TIN CÁ NHÂN (FORM CẬP NHẬT) --- *@
+                    <div class="mb-5">
+                        <h6 class="fw-bold text-muted small text-uppercase mb-3" style="letter-spacing: 1px;">Thông tin cá nhân</h6>
+
+                        @using (Html.BeginForm("UpdateProfile", "Manage", FormMethod.Post))
+                        {
+                            @Html.AntiForgeryToken()
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Họ và tên (Tên đăng nhập)</label>
+                                    <input type="text" class="form-control border-0 bg-light rounded-3" value="@User.Identity.Name" readonly>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Ngày tháng năm sinh</label>
+                                    <input type="date" name="birthDate" class="form-control border-0 bg-light rounded-3"
+                                           value="@(Model.BirthDate.HasValue ? Model.BirthDate.Value.ToString("yyyy-MM-dd") : "")">
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label small fw-bold">Địa chỉ nhận hàng mặc định</label>
+                                    <div class="input-group">
+                                        <input type="text" name="address" class="form-control border-0 bg-light rounded-3"
+                                               value="@Model.Address" placeholder="Nhập địa chỉ của bạn...">
+                                        <button type="submit" class="btn btn-warning rounded-3 ms-2 shadow-sm fw-bold px-4">Cập nhật</button>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    @* --- PHẦN 2: BẢO MẬT & OTP --- *@
+                    <div class="mb-2">
+                        <h6 class="fw-bold text-muted small text-uppercase mb-3" style="letter-spacing: 1px;">Bảo mật & Xác thực OTP</h6>
+
+                        @* Đổi mật khẩu *@
+                        <div class="d-flex align-items-center justify-content-between p-3 mb-3 rounded-4 border border-light-subtle bg-light shadow-sm">
+                            <div class="d-flex align-items-center">
+                                <div class="icon-box rounded-3 p-2 me-3 bg-white shadow-sm text-warning">
+                                    <i class="fa-solid fa-shield-halved"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold small">Mật khẩu đăng nhập</div>
+                                    <div class="text-muted extra-small">Yêu cầu xác nhận OTP qua Gmail khi đổi mật khẩu</div>
+                                </div>
+                            </div>
+                            @using (Html.BeginForm("SendPasswordOTP", "Manage", FormMethod.Post))
+                            {
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-outline-warning rounded-pill px-4 fw-bold btn-sm">Đổi mật khẩu</button>
+                            }
+                        </div>
+
+                        @* Số điện thoại liên kết *@
+                        <div class="d-flex align-items-center justify-content-between p-3 mb-3 rounded-4 border border-light-subtle bg-light shadow-sm">
+                            <div class="d-flex align-items-center">
+                                <div class="icon-box rounded-3 p-2 me-3 bg-white shadow-sm text-primary">
+                                    <i class="fa-solid fa-comment-sms"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold small">Xác thực số điện thoại</div>
+                                    <div class="text-muted extra-small">@(Model.PhoneNumber ?? "Chưa được xác thực mã OTP")</div>
+                                </div>
+                            </div>
+                            <a href="@Url.Action("AddPhoneNumber", "Manage")" class="btn btn-outline-primary rounded-pill px-4 fw-bold btn-sm">
+                                @(Model.PhoneNumber != null ? "Thay đổi" : "Liên kết ngay")
+                            </a>
+                        </div>
+
+                        @* Trạng thái xác thực 2 lớp *@
+                        <div class="d-flex align-items-center justify-content-between p-3 rounded-4 border border-light-subtle bg-light shadow-sm opacity-75">
+                            <div class="d-flex align-items-center">
+                                <div class="icon-box rounded-3 p-2 me-3 bg-white shadow-sm text-danger">
+                                    <i class="fa-solid fa-key"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold small">Xác thực 2 lớp (2FA)</div>
+                                    <div class="text-muted extra-small">Tính năng bảo trì bảo mật</div>
+                                </div>
+                            </div>
+                            <button class="btn btn-light rounded-pill px-4 fw-bold btn-sm disabled">Đang bảo trì</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    .extra-small {
+        font-size: 0.75rem;
+    }
+
+    .bg-success-subtle {
+        background-color: #d1fae5;
+    }
+
+    .form-control:focus {
+        box-shadow: none;
+        background-color: #fff !important;
+        border: 1px solid #ff8c00;
+    }
+
+    .hover-shadow:hover {
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+    }
+
+    .icon-box {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+</style>

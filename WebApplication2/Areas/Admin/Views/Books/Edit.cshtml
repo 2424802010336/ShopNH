@@ -1,149 +1,159 @@
 ﻿@model WebApplication2.Models.Book
-@{ ViewBag.Title = "Chỉnh sửa sản phẩm"; }
+@{
+    ViewBag.Title = "Chỉnh sửa sản phẩm";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
 
-<div class="container py-4">
-    <div class="row justify-content-center">
-        <div class="col-md-9">
-            <div class="card shadow border-0" style="border-radius: 20px;">
-                <div class="card-header bg-primary text-white text-center py-3" style="border-radius: 20px 20px 0 0;">
-                    <h3 class="fw-bold mb-0"><i class="fa-solid fa-pen-to-square"></i> CHỈNH SỬA SẢN PHẨM</h3>
+<div class="card shadow-lg border-0 rounded-4 p-4">
+    <h2 class="fw-bold text-primary mb-4 text-uppercase"><i class="fa-solid fa-pen-to-square"></i> Chỉnh sửa sản phẩm</h2>
+
+    @using (Html.BeginForm("Edit", "Books", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(model => model.Id)
+        @Html.HiddenFor(model => model.ImagePath)
+
+        <div class="row">
+            @* CỘT TRÁI: THÔNG TIN CHI TIẾT *@
+            <div class="col-md-8">
+                <div class="mb-3">
+                    <label class="fw-bold">Tên sản phẩm</label>
+                    @Html.EditorFor(model => model.Title, new { htmlAttributes = new { @class = "form-control" } })
                 </div>
-                <div class="card-body p-4">
-                    @using (Html.BeginForm("Edit", "Books", FormMethod.Post, new { enctype = "multipart/form-data" }))
-                    {
-                        @Html.AntiForgeryToken()
-                        @Html.HiddenFor(model => model.Id)
-                        @Html.HiddenFor(model => model.ImagePath)
 
-                        <div class="row">
-                            <div class="col-md-8">
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label class="fw-bold text-muted">Danh mục</label>
-                                        <select name="CategoryGroup" id="CategoryGroup" class="form-select fw-bold border-primary" onchange="toggleAdminFields()">
-                                            <option value="Vot" @(Model.Category != null && Model.Category.Contains("Vot") ? "selected" : "")>Vợt cầu lông</option>
-                                            <option value="Giay" @(Model.Category != null && Model.Category.Contains("Giay") ? "selected" : "")>Giày cầu lông</option>
-                                            <option value="Ao" @(Model.Category != null && Model.Category.Contains("Ao") ? "selected" : "")>Áo cầu lông</option>
-                                            <option value="Quan" @(Model.Category != null && Model.Category.Contains("Quan") ? "selected" : "")>Quần cầu lông</option>
-                                            <option value="Vay" @(Model.Category != null && Model.Category.Contains("Vay") ? "selected" : "")>Váy cầu lông</option>
-                                            <option value="TuiVot" @(Model.Category != null && Model.Category.Contains("Tui") ? "selected" : "")>Túi cầu lông</option>
-                                            <option value="Balo" @(Model.Category != null && Model.Category.Contains("Balo") ? "selected" : "")>Balo cầu lông</option>
-                                            <option value="PhuKien" @(Model.Category != null && Model.Category.Contains("PhuKien") ? "selected" : "")>Phụ kiện</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="fw-bold text-muted">Thương hiệu</label>
-                                        <select name="Brand" class="form-select border-primary">
-                                            @foreach (var b in new[] { "Yonex", "Lining", "VS", "Victor", "Mizuno" })
-                                            {
-                                                <option value="@b" @(Model.Category != null && Model.Category.Contains(b) ? "selected" : "")>@b</option>
-                                            }
-                                        </select>
-                                    </div>
-                                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="fw-bold">Chọn danh mục chính</label>
+                        <select name="CategoryGroup" id="CategoryGroup" class="form-select border-primary fw-bold" onchange="toggleFields()" required>
+                            <option value="Vot" @(Model.Category != null && Model.Category.Contains("Vot") ? "selected" : "")>Vợt cầu lông</option>
+                            <option value="Giay" @(Model.Category != null && Model.Category.Contains("Giay") ? "selected" : "")>Giày cầu lông</option>
+                            <option value="Ao" @(Model.Category != null && Model.Category.Contains("Ao") ? "selected" : "")>Áo cầu lông</option>
+                            <option value="Quan" @(Model.Category != null && Model.Category.Contains("Quan") ? "selected" : "")>Quần cầu lông</option>
+                            <option value="Vay" @(Model.Category != null && Model.Category.Contains("Vay") ? "selected" : "")>Váy cầu lông</option>
+                            <option value="TuiVot" @(Model.Category != null && Model.Category.Contains("Tui") ? "selected" : "")>Túi vợt</option>
+                            <option value="Balo" @(Model.Category != null && Model.Category.Contains("Balo") ? "selected" : "")>Balo cầu lông</option>
+                            <option value="PhuKien" @(Model.Category != null && (Model.Category == "Vo" || Model.Category == "QuanCan" || Model.Category == "QuaCau" || Model.Category == "Cuoc" || Model.Category == "ChanMoHoi")) ? "selected" : "" )>Phụ kiện</option>
+                        </select>
+                    </div>
 
-                                <div class="mb-3">
-                                    <label class="fw-bold text-muted">Tên sản phẩm</label>
-                                    @Html.EditorFor(model => model.Title, new { htmlAttributes = new { @class = "form-control shadow-sm" } })
-                                </div>
+                    <div class="col-md-6 mb-3" id="brand-area">
+                        <label class="fw-bold">Thương hiệu</label>
+                        <select name="Brand" id="Brand" class="form-select border-primary">
+                            @foreach (var b in new[] { "Yonex", "Lining", "VS", "Victor", "Mizuno" })
+                            {
+                                <option value="@b" @(Model.Category != null && Model.Category.Contains(b) ? "selected" : "")>@b</option>
+                            }
+                        </select>
+                    </div>
 
-                                @* THÔNG SỐ ĐỘNG *@
-                                <div id="admin-fields-vot" class="p-3 bg-light rounded-3 mb-3 border extra-fields" style="display:none;">
-                                    <h6 class="fw-bold text-dark border-bottom pb-2">Thông số Vợt</h6>
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <label class="small">Trọng lượng</label>
-                                            @Html.EditorFor(model => model.Weight, new { htmlAttributes = new { @class = "form-control" } })
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label class="small">Swingweight</label>
-                                            @Html.EditorFor(model => model.SwingWeight, new { htmlAttributes = new { @class = "form-control" } })
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label class="small">Chiều dài</label>
-                                            @Html.EditorFor(model => model.HandleLength, new { htmlAttributes = new { @class = "form-control" } })
-                                        </div>
-                                    </div>
-                                </div>
+                    <div class="col-md-6 mb-3" id="sub-category-area" style="display:none;">
+                        <label class="fw-bold text-success">Phân loại chi tiết</label>
+                        <select name="SubCategory" id="SubCategory" class="form-select border-success fw-bold">
+                            @* JS render dựa theo Category hiện tại *@
+                        </select>
+                    </div>
+                </div>
 
-                                <div id="admin-fields-general" class="p-3 bg-light rounded-3 mb-3 border extra-fields" style="display:none;">
-                                    <h6 class="fw-bold text-dark border-bottom pb-2">Kích thước & Form</h6>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <label class="small">Size có sẵn</label>
-                                            @Html.EditorFor(model => model.SizeList, new { htmlAttributes = new { @class = "form-control" } })
-                                        </div>
-                                        <div id="giay-only-edit" class="col-md-6" style="display:none;">
-                                            <label class="small">Form chân</label>
-                                            <select name="FormType" class="form-control">
-                                                <option value="Slim" @(Model.FormType == "Slim" ? "selected" : "")>Slim</option>
-                                                <option value="Unisex" @(Model.FormType == "Unisex" ? "selected" : "")>Unisex</option>
-                                                <option value="Wide" @(Model.FormType == "Wide" ? "selected" : "")>Wide</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="fw-bold">Giá niêm yết (đ)</label>
+                        @Html.EditorFor(model => model.Price, new { htmlAttributes = new { @class = "form-control", type = "number" } })
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="fw-bold text-danger">Giá khuyến mãi (đ)</label>
+                        @Html.EditorFor(model => model.SalePrice, new { htmlAttributes = new { @class = "form-control", type = "number" } })
+                    </div>
+                </div>
 
-                                <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <label class="fw-bold text-muted">Giá niêm yết</label>
-                                        @Html.EditorFor(model => model.Price, new { htmlAttributes = new { @class = "form-control shadow-sm" } })
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="fw-bold text-muted">Giá KM</label>
-                                        @Html.EditorFor(model => model.SalePrice, new { htmlAttributes = new { @class = "form-control shadow-sm" } })
-                                    </div>
-                                </div>
-
-                                <div class="mb-4">
-                                    <label class="fw-bold text-muted">Mô tả</label>
-                                    @Html.TextAreaFor(model => model.Description, new { @class = "form-control shadow-sm", rows = "4" })
-                                </div>
-
-                                <div class="d-flex justify-content-between">
-                                    <a href="@Url.Action("Index")" class="btn btn-outline-secondary px-4">Hủy bỏ</a>
-                                    <button type="submit" class="btn btn-primary fw-bold px-5">CẬP NHẬT NGAY</button>
-                                </div>
-                            </div>
-
-                            <div class="col-md-4 text-center">
-                                <label class="fw-bold text-muted d-block mb-2">Ảnh sản phẩm</label>
-                                <div class="border rounded-4 mb-3 d-flex align-items-center justify-content-center bg-light" style="min-height: 200px;">
-                                    <img id="adminPreview" src="@Url.Content(Model.ImagePath)" class="img-fluid rounded-4 shadow-sm" onerror="this.src='/Content/Images/no-image.png'">
-                                </div>
-                                <input type="file" name="uploadImage" class="form-control" onchange="showPreview(this)">
-                            </div>
+                @* KHU VỰC THÔNG SỐ RIÊNG *@
+                <div id="fields-vot" class="extra-fields border p-3 rounded-3 mb-3 shadow-sm" style="display:none; background: #f8f9fa;">
+                    <h6 class="text-primary fw-bold">THÔNG SỐ VỢT</h6>
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <label class="small fw-bold">Trọng lượng</label>
+                            @Html.EditorFor(model => model.Weight, new { htmlAttributes = new { @class = "form-control" } })
                         </div>
-                    }
+                        <div class="col-md-6 mb-2">
+                            <label class="small fw-bold">Swingweight</label>
+                            @Html.EditorFor(model => model.SwingWeight, new { htmlAttributes = new { @class = "form-control" } })
+                        </div>
+                    </div>
+                </div>
+
+                <div id="fields-size" class="extra-fields border p-3 rounded-3 mb-3 shadow-sm" style="display:none; background: #f8f9fa;">
+                    <h6 class="text-primary fw-bold">SIZE SẢN PHẨM</h6>
+                    @Html.EditorFor(model => model.SizeList, new { htmlAttributes = new { @class = "form-control" } })
+                </div>
+
+                <div id="fields-form-giay" class="extra-fields border p-3 rounded-3 mb-3 shadow-sm" style="display:none; background: #fff3e0;">
+                    <h6 class="text-warning fw-bold">FORM GIÀY</h6>
+                    <select name="FormType" class="form-select">
+                        <option value="Unisex" @(Model.FormType == "Unisex" ? "selected" : "")>Unisex</option>
+                        <option value="Slim" @(Model.FormType == "Slim" ? "selected" : "")>Slim</option>
+                        <option value="Wide" @(Model.FormType == "Wide" ? "selected" : "")>Wide</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="fw-bold">Mô tả sản phẩm</label>
+                    @Html.TextAreaFor(model => model.Description, new { @class = "form-control", rows = 5 })
+                </div>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg px-5 fw-bold shadow">CẬP NHẬT NGAY</button>
+                    <a href="@Url.Action("Index")" class="btn btn-outline-secondary btn-lg px-4 ms-2">Hủy bỏ</a>
                 </div>
             </div>
+
+            @* CỘT PHẢI: HÌNH ẢNH *@
+            <div class="col-md-4 text-center">
+                <label class="fw-bold d-block mb-2">Hình ảnh hiện tại</label>
+                <div class="border rounded-4 p-2 mb-3 bg-light" style="min-height: 300px; display: flex; align-items: center; justify-content: center;">
+                    <img id="previewImg" src="@Url.Content(Model.ImagePath)" class="img-fluid rounded-4 shadow-sm" style="max-height: 350px;" onerror="this.src='/Content/Images/no-image.png'">
+                </div>
+                <input type="file" name="uploadImage" class="form-control" onchange="previewFile(this)">
+            </div>
         </div>
-    </div>
+    }
 </div>
 
 @section scripts {
     <script>
-        window.onload = function () { toggleAdminFields(); };
+        $(document).ready(function() { toggleFields(); });
 
-        function toggleAdminFields() {
+        function toggleFields() {
             var cat = document.getElementById("CategoryGroup").value;
-            document.querySelectorAll('.extra-fields').forEach(el => el.style.display = 'none');
-            document.getElementById("giay-only-edit").style.display = 'none';
+            var subArea = document.getElementById("sub-category-area");
+            var subSelect = document.getElementById("SubCategory");
+            var brandArea = document.getElementById("brand-area");
 
-            if (cat === "Vot") {
-                document.getElementById("admin-fields-vot").style.display = 'block';
-            } else if (cat === "Giay") {
-                document.getElementById("admin-fields-general").style.display = 'block';
-                document.getElementById("giay-only-edit").style.display = 'block';
-            } else if (["Ao", "Quan", "Vay", "TuiVot"].includes(cat)) {
-                document.getElementById("admin-fields-general").style.display = 'block';
+            $(".extra-fields").hide();
+            subArea.style.display = 'none';
+            brandArea.style.display = 'block';
+
+            if (cat === "Vot") { $("#fields-vot").show(); }
+            else if (cat === "Giay") { $("#fields-size, #fields-form-giay").show(); }
+            else if (["Ao", "Quan", "Vay"].includes(cat)) { $("#fields-size").show(); }
+            else if (cat === "TuiVot") {
+                subArea.style.display = 'block';
+                subSelect.innerHTML = '<option value="NgangVai">Đeo ngang vai</option><option value="TrenLung">Đeo trên lưng</option>';
+            }
+            else if (cat === "PhuKien") {
+                brandArea.style.display = 'none';
+                subArea.style.display = 'block';
+                subSelect.innerHTML = `
+                    <option value="Vo" @(Model.Category == "Vo" ? "selected" : "")>Vớ cầu lông</option>
+                    <option value="QuanCan" @(Model.Category == "QuanCan" ? "selected" : "")>Quấn cán vợt</option>
+                    <option value="QuaCau" @(Model.Category == "QuaCau" ? "selected" : "")>Quả cầu lông</option>
+                    <option value="Cuoc" @(Model.Category == "Cuoc" ? "selected" : "")>Cước căng vợt</option>
+                    <option value="ChanMoHoi" @(Model.Category == "ChanMoHoi" ? "selected" : "")>Băng chặn mồ hôi</option>`;
             }
         }
 
-        function showPreview(input) {
+        function previewFile(input) {
             if (input.files && input.files[0]) {
                 var reader = new FileReader();
-                reader.onload = function (e) { document.getElementById("adminPreview").src = e.target.result; }
+                reader.onload = function (e) { document.getElementById("previewImg").src = e.target.result; }
                 reader.readAsDataURL(input.files[0]);
             }
         }

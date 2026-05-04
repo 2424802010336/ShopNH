@@ -1,0 +1,66 @@
+﻿@using PagedList.Mvc;
+@using PagedList;
+@model IPagedList<WebApplication2.Models.News>
+@{
+    ViewBag.Title = "Tin tức Cầu lông - ShopNH";
+}
+
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold text-uppercase" style="color: #ff8c00;">
+            <i class="fa-solid fa-newspaper me-2"></i>Tin tức & Kỹ thuật
+        </h2>
+        <hr class="mx-auto" style="width: 80px; height: 3px; background-color: #ff8c00; border: none; opacity: 1;">
+    </div>
+
+    <div class="row">
+        @if (Model != null && Model.Any())
+        {
+            foreach (var item in Model)
+            {
+                <div class="col-md-3 mb-4">
+                    <div class="card h-100 border-0 shadow-sm transition-hover" style="border-radius: 20px; overflow: hidden;">
+                        <div class="position-relative">
+                            @* SỬA LỖI TẠI ĐÂY: Thêm kiểm tra null cho ImagePath *@
+                            <img src="@(string.IsNullOrEmpty(item.ImagePath) ? "https://placehold.co/400x250?text=No+Image" : Url.Content(item.ImagePath))"
+                                 class="card-img-top" style="height: 180px; object-fit: cover;"
+                                 onerror="this.src='https://placehold.co/400x250?text=ShopNH'">
+
+                            <span class="badge position-absolute top-0 start-0 m-3" style="background: #ff8c00;">Tin mới</span>
+                        </div>
+                        <div class="card-body p-4">
+                            @* SỬA LỖI TẠI ĐÂY: Thêm toán tử ? sau CreatedDate để tránh lỗi null *@
+                            <small class="text-muted d-block mb-2">
+                                <i class="fa-regular fa-calendar me-1"></i>
+                                @(item.CreatedDate.ToString("dd/MM/yyyy") ?? "01/01/2026")
+                            </small>
+                            <h5 class="fw-bold text-dark line-clamp-2" style="height: 3rem;">@item.Title</h5>
+                            <p class="card-text text-secondary small line-clamp-3">@item.ShortDescription</p>
+                            <a href="@Url.Action("Details", "News", new { area = "", id = item.Id })"
+                               class="btn btn-sm fw-bold text-warning p-0">
+                                ĐỌC THÊM <i class="fa-solid fa-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12 text-center">
+                <p class="text-muted">Hiện chưa có tin tức nào được cập nhật.</p>
+            </div>
+        }
+    </div>
+
+    <div class="d-flex justify-content-center mt-4">
+        @if (Model != null)
+        {
+            @Html.PagedListPager(Model, page => Url.Action("Index", "News", new { page }),
+            new PagedListRenderOptions
+            {
+                LiElementClasses = new string[] { "page-item" }
+            })
+        }
+    </div>
+</div>

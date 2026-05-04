@@ -54,18 +54,6 @@ namespace WebApplication2.Controllers
             return View(product);
         }
 
-        // --- TRANG TIN TỨC & KỸ THUẬT CẦU LÔNG ---
-        public ActionResult News(int? page)
-        {
-            int pageSize = 12; // 12 bài mỗi trang (4 bài/dòng x 3 dòng)
-            int pageNumber = (page ?? 1);
-
-            var newsList = db.News.OrderByDescending(x => x.CreatedDate)
-                          .ToPagedList(pageNumber, pageSize);
-
-            return View(newsList);
-        }
-
         // --- TRANG GIỚI THIỆU SHOP NH ---
         public ActionResult About()
         {

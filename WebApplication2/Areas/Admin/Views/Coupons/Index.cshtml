@@ -1,61 +1,133 @@
-﻿@model IEnumerable<WebApplication2.Models.Coupon>
+﻿@using PagedList.Mvc;
+@model PagedList.IPagedList<WebApplication2.Models.Coupon>
 @{
     ViewBag.Title = "Quản lý Voucher";
     Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="fw-bold m-0 text-dark"><i class="fa-solid fa-ticket-simple me-2 text-primary"></i>QUẢN LÝ VOUCHER</h2>
-    <div>
-        <a href="@Url.Action("ApplySale")" class="btn btn-warning rounded-pill px-4 shadow-sm me-2 fw-bold text-dark">
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 p-3 rounded-4 shadow-sm" style="background: #1e293b; border-left: 6px solid #fbbf24;">
+        <div class="d-flex align-items-center">
+            <h4 class="fw-bold text-white m-0 me-3">
+                <i class="fa-solid fa-ticket-simple text-warning me-2"></i> VOUCHER
+            </h4>
+            <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fw-bold">
+                @Model.TotalItemCount mã
+            </span>
+        </div>
+
+        @* Thanh tìm kiếm thon gọn *@
+        @using (Html.BeginForm("Index", "Coupons", FormMethod.Get, new { @class = "d-flex", style = "width: 350px;" }))
+        {
+            <div class="input-group">
+                <input type="text" name="searchString" value="@ViewBag.CurrentFilter"
+                       class="form-control rounded-pill-start border-0 ps-3 bg-light"
+                       placeholder="Tìm mã voucher...">
+                <button type="submit" class="btn btn-warning rounded-pill-end px-3 shadow-sm">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
+            </div>
+        }
+    </div>
+
+    <div class="mb-3 text-end">
+        <a href="@Url.Action("ApplySale")" class="btn btn-outline-primary rounded-pill px-4 fw-bold me-2">
             <i class="fa-solid fa-tag me-2"></i>Áp dụng Sale
         </a>
-        <a href="@Url.Action("Create")" class="btn btn-primary rounded-pill px-4 shadow-sm fw-bold">
+        <a href="@Url.Action("Create")" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">
             <i class="fa-solid fa-plus me-2"></i>Tạo mã mới
         </a>
     </div>
-</div>
 
-<div class="card border-0 shadow-lg rounded-4 overflow-hidden">
-    <div class="card-body p-0 bg-white">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="bg-dark text-white">
-                    <tr>
-                        <th class="ps-4 py-3" style="width: 25%">Mã Voucher</th>
-                        <th style="width: 20%">Giảm (%)</th>
-                        <th style="width: 30%">Ngày hết hạn</th>
-                        <th class="text-center" style="width: 25%">Thao tác</th>
-                    </tr>
-                </thead>
-                <tbody class="text-dark">
-                    @foreach (var item in Model)
-                    {
+    <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+        <div class="card-body p-0 bg-white">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-dark text-white">
                         <tr>
-                            <td class="ps-4">
-                                <span class="fw-bold text-primary fs-5">@item.Code</span>
-                            </td>
-                            <td>
-                                <span class="badge bg-danger rounded-pill px-3">Giảm @item.DiscountPercent%</span>
-                            </td>
-                            <td>
-                                <div class="d-flex align-items-center text-muted">
-                                    <i class="fa-regular fa-calendar-days me-2"></i>
-                                    @item.ExpiryDate.ToString("dd/MM/yyyy")
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <a href="@Url.Action("Edit", new { id = item.Id })" class="btn btn-sm btn-outline-primary border-0 rounded-circle me-1" title="Sửa">
-                                    <i class="fa-solid fa-pen-to-square fs-5"></i>
-                                </a>
-                                <a href="@Url.Action("Delete", new { id = item.Id })" class="btn btn-sm btn-outline-danger border-0 rounded-circle" title="Xóa" onclick="return confirm('Bạn có chắc muốn xóa mã này?')">
-                                    <i class="fa-solid fa-trash-can fs-5"></i>
-                                </a>
-                            </td>
+                            <th class="ps-4 py-3" style="width: 30%">Mã Voucher</th>
+                            <th style="width: 20%">Giảm (%)</th>
+                            <th style="width: 25%">Ngày hết hạn</th>
+                            <th class="text-center" style="width: 25%">Thao tác</th>
                         </tr>
-                    }
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody class="text-dark">
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="ps-4">
+                                        <span class="fw-bold text-primary fs-5">@item.Code</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-danger rounded-pill px-3 py-2">Giảm @item.DiscountPercent%</span>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center text-muted">
+                                            <i class="fa-regular fa-calendar-days me-2"></i>
+                                            @item.ExpiryDate.ToString("dd/MM/yyyy")
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <a href="@Url.Action("Edit", new { id = item.Id })" class="btn btn-sm btn-outline-primary border-0 rounded-circle me-1" title="Sửa">
+                                            <i class="fa-solid fa-pen-to-square fs-5"></i>
+                                        </a>
+                                        <a href="@Url.Action("Delete", new { id = item.Id })" class="btn btn-sm btn-outline-danger border-0 rounded-circle" title="Xóa" onclick="return confirm('Bạn có chắc muốn xóa mã này?')">
+                                            <i class="fa-solid fa-trash-can fs-5"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center py-5 text-muted">Không tìm thấy mã voucher nào.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
+
+    @* --- Phân trang chuẩn ShopNH --- *@
+    <div class="pagination-container d-flex justify-content-center mt-4">
+        @Html.PagedListPager(Model, page => Url.Action("Index", new { page, searchString = ViewBag.CurrentFilter }),
+        new PagedListRenderOptions
+             {
+            LiElementClasses = new string[] { "page-item" },
+            UlElementClasses = new string[] { "pagination shadow-sm" }
+        })
+    </div>
 </div>
+
+<style>
+    .rounded-pill-start {
+        border-top-left-radius: 50rem !important;
+        border-bottom-left-radius: 50rem !important;
+    }
+
+    .rounded-pill-end {
+        border-top-right-radius: 50rem !important;
+        border-bottom-right-radius: 50rem !important;
+    }
+
+    .pagination .page-item .page-link {
+        color: #4b5563;
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        margin: 0 2px;
+        padding: 8px 16px;
+        font-weight: 600;
+        border-radius: 8px;
+        text-decoration: none;
+    }
+
+    .pagination .page-item.active .page-link {
+        background-color: #fbbf24 !important; /* Màu vàng đồng bộ Voucher */
+        border-color: #fbbf24 !important;
+        color: white;
+    }
+</style>

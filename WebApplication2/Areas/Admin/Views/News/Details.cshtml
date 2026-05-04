@@ -59,10 +59,10 @@
 
                     <hr>
                     <div class="d-flex gap-2">
-                        <a href="@Url.Action("Edit", new { id = Model.Id })" class="btn btn-warning px-4 rounded-pill fw-bold shadow-sm">
+                        <a href="@Url.Action("Edit", "News", new { area = "Admin", id = Model.Id })" class="btn btn-warning px-4 rounded-pill fw-bold shadow-sm">
                             <i class="fa-solid fa-pen-to-square me-2"></i>Chỉnh sửa bài viết
                         </a>
-                        <a href="@Url.Action("Delete", new { id = Model.Id })" class="btn btn-outline-danger px-4 rounded-pill fw-bold">
+                        <a href="@Url.Action("Delete", "News", new { area = "Admin", id = Model.Id })" class="btn btn-outline-danger px-4 rounded-pill fw-bold">
                             <i class="fa-solid fa-trash-can me-2"></i>Xóa tin này
                         </a>
                     </div>

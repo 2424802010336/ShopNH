@@ -18,6 +18,11 @@
                         <i class="fa-solid fa-user-gear"></i> Hồ sơ cá nhân
                     </a>
 
+                    @* --- MỤC THÊM MỚI TẠI ĐÂY --- *@
+                    <a href="@Url.Action("MyOrders", "Cart")" class="account-item">
+                        <i class="fa-solid fa-truck-fast"></i> Thông Tin Đơn hàng
+                    </a>
+
                     @if (User.IsInRole("Admin"))
                     {
                         <a href="@Url.Action("AdminDashboard", "Books", new { area = "Admin" })" class="account-item fw-bold text-primary bg-primary bg-opacity-10">
@@ -41,7 +46,6 @@
 }
 else
 {
-    @* HIỂN THỊ KHI CHƯA ĐĂNG NHẬP *@
     <div class="d-flex align-items-center">
         <a href="@Url.Action("Login", "Account")" class="nav-link text-white me-2">
             <i class="fa-solid fa-right-to-bracket"></i> Đăng nhập
